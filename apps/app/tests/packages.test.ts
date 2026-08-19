@@ -154,4 +154,34 @@ describe("package MCP orchestration", () => {
     expect(first.map((item) => item.id)).toEqual(second.map((item) => item.id));
     expect(seedUnit("stable-seed")).toBe(seedUnit("stable-seed"));
   });
+
+  it("returns a preference summary when swipe weights arrive", async () => {
+    const result = await buildPackagesResponse({
+      ...request,
+      preferences: { bus: 1, море: 0.6 },
+    }, {
+      now: () => new Date("2026-08-19T12:00:00.000Z"),
+      callTool: callMap({
+        outbound: { structuredContent: { variants: [{ product_type: "bus", price: { amount: 3_000, currency: "RUB" }, checkout_ref: { offer_hash: "out" } }] } },
+        return: { structuredContent: { variants: [{ product_type: "bus", price: { amount: 3_500, currency: "RUB" }, checkout_ref: { offer_hash: "back" } }] } },
+        hotels: { structuredContent: { hotels: [{ name: "Кама", best_offer: { price: { amount: 5_000, currency: "RUB" } } }] } },
+      }),
+    });
+    expect(result.preferenceSummary).toBe("вам важны bus, море");
+  });
+
+  it("covers rail through search_multitransport instead of a separate search_rail call", async () => {
+    const tools: string[] = [];
+    await buildPackagesResponse({
+      ...request,
+      intent: { ...request.intent, allowedTransport: ["rail"] },
+    }, {
+      callTool: async (name) => {
+        tools.push(name);
+        return { structuredContent: { variants: [], hotels: [] } };
+      },
+    });
+    expect(tools).toEqual(["search_multitransport", "search_multitransport", "search_hotels"]);
+    expect(tools.includes("search_rail")).toBe(false);
+  });
 });

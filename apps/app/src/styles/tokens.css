@@ -1,0 +1,53 @@
+:root {
+  --ink-navy: #0d0b68;
+  --brand-background: #0d0b68;
+  --signal-violet: #7d71ff;
+  --signal-deep: #5149d8;
+  --paper-ticket: #fcfaf5;
+  --paper-raised: #ffffff;
+  --wash-lilac: #eef0ff;
+  --horizon-peach: #ffd3b0;
+  --window-sun: #efba6f;
+  --path-mint: #c8e4d0;
+  --voice: #0d0b68;
+  --voice-soft: #3f3d6a;
+  --voice-muted: #5a587c;
+  --edge: rgba(13, 11, 104, 0.14);
+  --edge-strong: rgba(13, 11, 104, 0.22);
+  --warn-ink: #67280f;
+  --warn-wash: #fff1ea;
+  --caution-ink: #5c4500;
+  --caution-wash: #fff6d6;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --radius-stamp: 8px;
+  --radius-control: 12px;
+  --radius-card: 16px;
+  --radius-brand-shell: 24px;
+  --lift-paper:
+    0 0 0 1px rgba(13, 11, 104, 0.06),
+    0 1px 2px rgba(27, 21, 105, 0.06),
+    0 18px 36px rgba(27, 21, 105, 0.1);
+  --lift-press:
+    0 0 0 1px rgba(13, 11, 104, 0.08),
+    0 8px 18px rgba(27, 21, 105, 0.08);
+  --font: "Onest Variable", Onest, ui-sans-serif, system-ui, sans-serif;
+  --press-ms: 120ms;
+  --sheet-ms: 240ms;
+  --thread-ms: 450ms;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --touch: 48px;
+  color: var(--voice);
+  background: var(--paper-ticket);
+  font-family: var(--font);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}

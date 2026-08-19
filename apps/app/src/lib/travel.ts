@@ -1,3 +1,5 @@
+import { MAX_LIKED_DIRECTIONS, nextPreference as applyPreference, rankPackages, topSignals as preferenceSignals, type PreferenceVector } from "../../shared/prefs";
+
 export type DestinationIdea = {
   id: string;
   destination: string;
@@ -26,16 +28,21 @@ export type PackageOption = {
   ideaId?: string;
   destination?: string;
   title?: string;
+  role?: "optimal" | "faster_or_comfortable" | string;
   price?: { amount?: number; currency?: string; confidence?: "exact_round_trip" | "estimated_split_trip" | string };
-  transport?: { title?: string; mode?: string; summary?: string; checkoutRef?: Record<string, unknown> };
+  transport?: { title?: string; mode?: string; summary?: string; checkoutRef?: Record<string, unknown>; returnCheckoutRef?: Record<string, unknown> };
   hotel?: { title?: string; name?: string; summary?: string; checkoutRef?: Record<string, unknown> };
   checkoutRef?: Record<string, unknown>;
   [key: string]: unknown;
 };
 
 export type ApiIssue = { message?: string; code?: string; retryable?: boolean; stage?: string };
-export type PackagesResult = { packages: PackageOption[]; warnings?: ApiIssue[] };
-export type CheckoutResult = { url: string; kind: string; fallbackUrl?: string; note?: string };
+export type PackagesResult = { packages: PackageOption[]; warnings?: ApiIssue[]; preferenceSummary?: string };
+export type CheckoutStep = { order: number; label: string; url: string; product: string; note?: string };
+export type CheckoutResult = { url: string; kind: string; fallbackUrl?: string; note?: string; steps?: CheckoutStep[] };
+
+export { MAX_LIKED_DIRECTIONS };
+export type { PreferenceVector };
 
 async function post<T>(path: string, body: unknown): Promise<T> {
   const response = await fetch(path, {
@@ -54,20 +61,41 @@ export function interpretTrip(prompt: string, answers: Record<string, string> = 
   return post<InterpretResult>("/api/interpret", { prompt, answers, locale: "ru-RU" });
 }
 
-export function getPackages(idea: DestinationIdea, intent: TravelIntent, sessionSeed: string) {
-  if (intent.childrenAges.length > 0) {
-    throw new Error("Пакеты с детскими тарифами пока не считаются автоматически. Выберите вариант на Туту отдельно.");
-  }
+export function getPackages(
+  idea: DestinationIdea,
+  intent: TravelIntent,
+  sessionSeed: string,
+  preferences: PreferenceVector = {},
+) {
   const adults = Math.min(6, Math.max(1, intent.adults));
+  const childrenAges = intent.childrenAges.filter((age) => Number.isInteger(age) && age >= 0 && age <= 17);
   return post<PackagesResult>("/api/packages", {
-    intent: { ...intent, adults },
+    intent: { ...intent, adults, childrenAges },
     idea,
+    preferences,
     sessionSeed,
   });
 }
 
-export function getCheckout(checkoutRef: Record<string, unknown>) {
-  return post<CheckoutResult>("/api/checkout", { checkoutRef });
+export function checkoutRefsOf(item: PackageOption): Record<string, unknown>[] {
+  const refs: Record<string, unknown>[] = [];
+  const seen = new Set<string>();
+  const push = (value: unknown) => {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return;
+    const key = JSON.stringify(value);
+    if (seen.has(key)) return;
+    seen.add(key);
+    refs.push(value as Record<string, unknown>);
+  };
+  push(item.transport?.checkoutRef);
+  push(item.transport?.returnCheckoutRef);
+  push(item.hotel?.checkoutRef);
+  push(item.checkoutRef);
+  return refs;
+}
+
+export function getCheckout(refs: Record<string, unknown>[]) {
+  return post<CheckoutResult>("/api/checkout", { refs });
 }
 
 export function formatRub(amount?: number, currency = "RUB") {
@@ -75,14 +103,45 @@ export function formatRub(amount?: number, currency = "RUB") {
   return new Intl.NumberFormat("ru-RU", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount);
 }
 
+const TRANSPORT_MODE_LABELS: Record<string, string> = {
+  avia: "АВИА",
+  rail: "ПОЕЗД",
+  bus: "АВТОБУС",
+  etrain: "ЭЛЕКТРИЧКА",
+  multitransport: "КОМБО",
+  transport: "ТРАНСПОРТ",
+};
+
+export function transportModeLabel(mode?: string): string | undefined {
+  if (!mode) return undefined;
+  const mapped = TRANSPORT_MODE_LABELS[mode.toLowerCase()];
+  if (mapped) return mapped;
+  return mode.toLocaleUpperCase("ru-RU");
+}
+
+export function transportLabel(transport?: { mode?: string; title?: string }): string {
+  const fromMode = transportModeLabel(transport?.mode);
+  if (fromMode) return fromMode;
+  if (transport?.title) return transport.title;
+  return "Вариант транспорта";
+}
+
 export function newSeed() { return crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`; }
 
-export type PreferenceVector = Record<string, number>;
 export function nextPreference(vector: PreferenceVector, idea: DestinationIdea, liked: boolean): PreferenceVector {
-  const delta = liked ? 1 : -0.45;
-  return idea.tags.reduce<PreferenceVector>((next, tag) => ({ ...next, [tag]: (next[tag] ?? 0) + delta }), vector);
+  return applyPreference(vector, idea.tags, liked);
 }
 
 export function topSignals(vector: PreferenceVector) {
-  return Object.entries(vector).sort(([, a], [, b]) => b - a).filter(([, value]) => value > 0).slice(0, 3).map(([key]) => key);
+  return preferenceSignals(vector);
+}
+
+export function rankLivePackages(packages: PackageOption[], preferences: PreferenceVector, sessionSeed: string): PackageOption[] {
+  const rankable = packages.filter((item): item is PackageOption & { transport: { mode: string }; price: { amount: number } } => (
+    typeof item.transport?.mode === "string"
+    && item.transport.mode.length > 0
+    && typeof item.price?.amount === "number"
+  ));
+  if (rankable.length !== packages.length) return packages;
+  return rankPackages(rankable, preferences, sessionSeed);
 }

@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  app:
+    name: App checks + MCP smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - run: npm run --prefix apps/app typecheck
+      - run: npm run --prefix apps/app test
+      - run: npm run --prefix apps/app build
+      - name: Live MCP tool-name gate
+        run: npm run --prefix apps/app mcp-smoke

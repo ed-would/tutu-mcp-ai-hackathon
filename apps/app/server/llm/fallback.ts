@@ -1,3 +1,4 @@
+import { partyFromAnswers } from "../../shared/party";
 import {
   type ClarificationQuestion,
   type DestinationIdea,
@@ -54,9 +55,14 @@ function extractOrigin(request: InterpretRequest): string | undefined {
 }
 
 function extractDates(request: InterpretRequest): [string?, string?] {
+  const combined = answer(request, "dates");
   const departure = answer(request, "departureDate", "dateFrom", "startDate");
   const returning = answer(request, "returnDate", "dateTo", "endDate");
-  if (departure && returning) return [departure, returning];
+  if (departure && returning) return [normalizeDate(departure), normalizeDate(returning)];
+  if (combined) {
+    const dates = [...combined.matchAll(/\b(20\d{2}-\d{2}-\d{2}|\d{2}\.\d{2}\.20\d{2})\b/g)].map((match) => match[1]);
+    if (dates[0] && dates[1]) return [normalizeDate(dates[0]), normalizeDate(dates[1])];
+  }
   const text = inputText(request);
   const dates = [...text.matchAll(/\b(20\d{2}-\d{2}-\d{2}|\d{2}\.\d{2}\.20\d{2})\b/g)].map((match) => match[1]);
   return [normalizeDate(departure ?? dates[0]), normalizeDate(returning ?? dates[1])];
@@ -70,6 +76,10 @@ function normalizeDate(value: string | undefined): string | undefined {
 
 function extractBudget(request: InterpretRequest): number | undefined {
   const explicit = answer(request, "budget", "budgetRub");
+  if (explicit) {
+    const digits = explicit.replace(/\s/g, "").match(/^(\d{3,})$/);
+    if (digits) return Number(digits[1]);
+  }
   const text = explicit ?? inputText(request);
   const match = text.match(/(?:до|бюджет(?:ом)?|budget)\s*(\d[\d\s]{2,})\s*(?:₽|руб|рублей|rur|rub)?/i)
     ?? text.match(/(\d[\d\s]{3,})\s*(?:₽|руб|рублей|rur|rub)/i);
@@ -77,25 +87,24 @@ function extractBudget(request: InterpretRequest): number | undefined {
   return value ? Number(value) : undefined;
 }
 
-function extractParty(request: InterpretRequest): { adults?: number; childrenAges?: number[] } {
-  const adultsValue = answer(request, "adults", "adultCount", "взрослые");
-  const childrenValue = answer(request, "childrenAges", "children", "дети");
+function extractParty(request: InterpretRequest): { adults?: number; childrenAges: number[] } {
+  const fromAnswers = partyFromAnswers(request.answers);
+  if (fromAnswers.adults) return fromAnswers;
   const text = inputText(request);
-  const adults = adultsValue ? Number(adultsValue.match(/\d+/)?.[0]) : Number(text.match(/(\d+)\s*(?:взросл|adult)/i)?.[1]);
-  const ages = childrenValue
-    ? [...childrenValue.matchAll(/\d+/g)].map((match) => Number(match[0])).filter((age) => age <= 17)
-    : [...text.matchAll(/(?:дет(?:ей|и)|children)[^\d]*(\d{1,2})/gi)].map((match) => Number(match[1])).filter((age) => age <= 17);
-  if (Number.isFinite(adults) && adults > 0) return { adults, childrenAges: ages };
-  if (/вдво[её]м|нас двое|мы двое|двое\s+взросл|for two/i.test(text)) return { adults: 2, childrenAges: [] };
-  if (/один\s+взросл|одна\s+взросл|еду один|еду одна|solo|alone/i.test(text)) return { adults: 1, childrenAges: [] };
-  return { childrenAges: ages };
+  if (/вдво[её]м|нас двое|мы двое|двое\s+взросл|for two/i.test(text)) {
+    return { adults: 2, childrenAges: fromAnswers.childrenAges };
+  }
+  if (/один\s+взросл|одна\s+взросл|еду один|еду одна|solo|alone/i.test(text)) {
+    return { adults: 1, childrenAges: fromAnswers.childrenAges };
+  }
+  return { childrenAges: fromAnswers.childrenAges };
 }
 
 function missingQuestions(origin: string | undefined, dates: [string?, string?], party: { adults?: number }, budget: number | undefined): ClarificationQuestion[] {
   const questions: ClarificationQuestion[] = [];
   if (!origin) questions.push({ id: "origin", prompt: "Из какого города выезжаете?" });
   if (!dates[0] || !dates[1]) questions.push({ id: "dates", prompt: "Какие точные даты поездки: выезд и возвращение?" });
-  if (!party.adults) questions.push({ id: "party", prompt: "Сколько будет взрослых и детей? Укажите возраст детей." });
+  if (!party.adults) questions.push({ id: "party", prompt: "Кто едет с вами?" });
   if (!budget) questions.push({ id: "budget", prompt: "Какой общий бюджет поездки в рублях?" });
   return questions.slice(0, 3);
 }

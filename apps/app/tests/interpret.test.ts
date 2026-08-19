@@ -77,6 +77,8 @@ describe("POST /api/interpret", () => {
     expect(response.status).toBe(200);
     expect(body.status).toBe("needs_clarification");
     expect(body.questions.length).toBeLessThanOrEqual(3);
+    expect(body.questions.some((question: { id: string }) => question.id === "origin")).toBe(true);
+    expect(body.draftIntent.origin).toBeUndefined();
     expect(body.questions.every((question: { prompt: string }) => /[А-Яа-яЁё]/.test(question.prompt))).toBe(true);
     expect(calls).toEqual([
       "https://api.neuraldeep.ru/v1/chat/completions",
@@ -93,6 +95,57 @@ describe("POST /api/interpret", () => {
     expect(body).toMatchObject({ status: "ready", generation: "rule_fallback" });
     expect(body.ideas).toHaveLength(8);
     expect(body.intent.origin).toBe("Москва");
+  });
+
+  it("returns ready after clarify answers with plain numeric budget", async () => {
+    const response = await interpretHandler(new Request("http://localhost/api/interpret", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        locale: "ru-RU",
+        prompt: "Хочу на море",
+        answers: {
+          origin: "Москва",
+          dates: "2026-09-12 и 2026-09-15",
+          adults: "2",
+          children: "0",
+          budget: "40000",
+        },
+      }),
+    }), {
+      fetchImpl: async () => new Response("upstream failure", { status: 503 }),
+      env: { NEURALDEEP_API_KEY: "neural-key" },
+    });
+    const body = await response.json();
+    expect(body).toMatchObject({ status: "ready", generation: "rule_fallback" });
+    expect(body.ideas).toHaveLength(8);
+    expect(body.intent.budgetRub).toBe(40000);
+  });
+
+  it("maps structured adult and child counts onto the family intent", async () => {
+    const response = await interpretHandler(new Request("http://localhost/api/interpret", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        locale: "ru-RU",
+        prompt: "Хочу на море с детьми",
+        answers: {
+          origin: "Москва",
+          departureDate: "2026-09-12",
+          returnDate: "2026-09-15",
+          adults: "2",
+          children: "1",
+          budget: "40000",
+        },
+      }),
+    }), {
+      fetchImpl: async () => new Response("upstream failure", { status: 503 }),
+      env: { NEURALDEEP_API_KEY: "neural-key" },
+    });
+    const body = await response.json();
+    expect(body).toMatchObject({ status: "ready", generation: "rule_fallback" });
+    expect(body.intent.adults).toBe(2);
+    expect(body.intent.childrenAges).toEqual([8]);
   });
 
   it("rejects malformed JSON and oversized bodies", async () => {

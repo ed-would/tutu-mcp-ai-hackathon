@@ -4,14 +4,7 @@ import {
   connectTutuMcp,
   TUTU_MCP_ENDPOINT,
 } from "../server/mcp/client.js";
-
-const REQUIRED_TOOLS = [
-  "search_multitransport",
-  "search_avia",
-  "search_bus",
-  "search_hotels",
-  "create_checkout_link",
-] as const;
+import { TUTU_MCP_TOOLS } from "../server/mcp/tools.js";
 
 export async function runMcpSmoke(): Promise<void> {
   let connection;
@@ -23,7 +16,7 @@ export async function runMcpSmoke(): Promise<void> {
       .map((tool) => tool.name)
       .filter((name): name is string => typeof name === "string")
       .sort();
-    const missing = REQUIRED_TOOLS.filter((name) => !names.includes(name));
+    const missing = TUTU_MCP_TOOLS.filter((name) => !names.includes(name));
 
     if (missing.length > 0) {
       throw new Error(`required tools missing: ${missing.join(", ")}`);

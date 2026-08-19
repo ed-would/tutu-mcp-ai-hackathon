@@ -170,7 +170,7 @@ function planCalls(inputs: SearchInputs): PlannedCall[] {
       calls.push({ key: "outbound", tool: "search_bus", args: busArgs(inputs, "out") });
       calls.push({ key: "return", tool: "search_bus", args: busArgs(inputs, "return") });
     }
-  } else if (wants(inputs, "multitransport")) {
+  } else if (wants(inputs, "multitransport") || wants(inputs, "rail")) {
     calls.push({ key: "outbound", tool: "search_multitransport", args: multiArgs(inputs, "out") });
     calls.push({ key: "return", tool: "search_multitransport", args: multiArgs(inputs, "return") });
   } else if (wants(inputs, "bus")) {

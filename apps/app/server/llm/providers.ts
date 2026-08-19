@@ -138,7 +138,9 @@ function providerPrompt(request: InterpretRequest): string {
   return [
     "Ты — Travel Tinder, планировщик путешествий для России. Отвечай только валидным JSON без markdown.",
     "Не выдумывай цены, расписания, наличие билетов или отелей: их получает отдельный live Tutu MCP слой.",
-    "Если критичных данных не хватает (город отправления, точные даты туда/обратно, состав группы или бюджет), верни status needs_clarification и не придумывай значения.",
+    "Если критичных данных не хватает (город отправления, точные даты туда/обратно, состав группы или бюджет), верни status needs_clarification.",
+    "Для состава группы используй вопрос id=party. Клиент пришлёт answers.adults и answers.children целыми числами — не проси писать это одной фразой.",
+    "Не подставляй скрытые дефолты вроде «Москва» или «ближайшие выходные», если пользователь этого не сказал — спроси.",
     "Если данных хватает, верни status ready, intent и ровно 8 разных DestinationIdea на русском языке.",
     "Формат ready: {status, intent, ideas}. intent: origin, departureDate, returnDate, adults, childrenAges, budgetRub, pace (slow|balanced|active), interests, desiredVibe, allowedTransport, hotelPreferences.",
     "allowedTransport — обязательно JSON-массив значений avia|rail|bus|multitransport; hotelPreferences — объект вида {mode:'choose_self'}.",

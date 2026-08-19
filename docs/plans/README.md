@@ -48,6 +48,7 @@ Add prefix-named plans here as the solution takes shape (`product-`, `architectu
 | [travel-tinder-exec-roadmap.md](travel-tinder-exec-roadmap.md) | Ordered execution roadmap |
 | [travel-tinder-exec-qa.md](travel-tinder-exec-qa.md) | QA and release verification steps |
 | [travel-tinder-exec-qa-matrix.md](travel-tinder-exec-qa-matrix.md) | QA evidence matrix |
+| [travel-tinder-visual-asset-prompts.md](travel-tinder-visual-asset-prompts.md) | Image-generation prompts for logo, hero, postcards, guide art |
 
 ---
 

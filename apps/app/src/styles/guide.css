@@ -1,0 +1,445 @@
+.page.page-guide {
+  margin: 0 auto;
+  max-width: 1080px;
+  overflow-x: clip;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  width: 100%;
+}
+
+.guide-tour {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.guide-progress {
+  background: var(--paper-ticket);
+  border-bottom: 1px solid var(--edge);
+  margin: 0 -4px 4px;
+  padding: 4px 4px 8px;
+  position: sticky;
+  top: -8px;
+  z-index: 3;
+}
+
+.guide-progress-top {
+  align-items: baseline;
+  display: flex;
+  gap: var(--space-4);
+  justify-content: space-between;
+}
+
+.guide-progress-top .eyebrow {
+  margin-bottom: var(--space-3);
+}
+
+.guide-progress-top .text-link {
+  flex: none;
+  font-size: 14px;
+}
+
+.guide-stamps {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: space-between;
+  list-style: none;
+  margin: 0 0 var(--space-2);
+  padding: 0;
+  position: relative;
+}
+
+.guide-stamps::before {
+  background: var(--edge);
+  content: "";
+  height: 2px;
+  left: 24px;
+  position: absolute;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.guide-stamps::after {
+  background: var(--signal-violet);
+  content: "";
+  height: 2px;
+  left: 24px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: calc((100% - 48px) * var(--guide-progress, 0));
+  z-index: 0;
+}
+
+.guide-stamp {
+  align-items: center;
+  background: var(--paper-raised);
+  border: 1px solid var(--edge);
+  border-radius: 999px;
+  color: var(--voice-muted);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 800;
+  height: var(--touch);
+  justify-content: center;
+  letter-spacing: 0.06em;
+  min-width: var(--touch);
+  padding: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.guide-stamp.is-done {
+  background: var(--wash-lilac);
+  border-color: rgba(125, 113, 255, 0.45);
+  color: var(--signal-deep);
+}
+
+.guide-stamp.is-current {
+  background: var(--ink-navy);
+  border-color: var(--ink-navy);
+  box-shadow: 0 3px 0 var(--signal-violet);
+  color: var(--paper-ticket);
+}
+
+.guide-stage {
+  display: grid;
+  gap: var(--space-5);
+  position: relative;
+}
+
+.guide-copy-head {
+  position: relative;
+}
+
+.guide-copy-head h1 {
+  font-size: clamp(32px, 8vw, 52px);
+  margin-bottom: 0;
+}
+
+.guide-stage-mark {
+  color: var(--wash-lilac);
+  font-size: 88px;
+  font-weight: 900;
+  letter-spacing: -0.1em;
+  line-height: 0.6;
+  margin: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: -6px;
+  z-index: 0;
+}
+
+.guide-copy-head .eyebrow,
+.guide-copy-head h1 {
+  position: relative;
+  z-index: 1;
+}
+
+.guide-copy-body {
+  max-width: 42rem;
+}
+
+.guide-demo {
+  min-width: 0;
+}
+
+.guide-rehearsal {
+  color: var(--signal-deep);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  margin: 0 0 var(--space-4);
+  text-transform: uppercase;
+}
+
+.guide-demo-note {
+  color: var(--voice-soft);
+  font-size: 15px;
+  margin: var(--space-4) 0 0;
+}
+
+.guide-demo-card .button {
+  margin-top: var(--space-2);
+}
+
+.page-guide .guide-ticket {
+  position: relative;
+}
+
+.page-guide .guide-ticket::before {
+  background-image: radial-gradient(circle, var(--paper-ticket) 3.5px, transparent 4px);
+  background-position: center 0;
+  background-repeat: repeat-y;
+  background-size: 12px 16px;
+  content: "";
+  height: calc(100% - 20px);
+  left: -6px;
+  pointer-events: none;
+  position: absolute;
+  top: 10px;
+  width: 12px;
+  z-index: 2;
+}
+
+.page-guide .clarify-card .quick-prompts {
+  margin: 8px 0 4px;
+}
+
+.page-guide .guide-price-card.is-exact.is-active {
+  border-color: var(--ink-navy);
+  box-shadow: var(--lift-paper), 0 0 0 2px var(--ink-navy);
+  outline: none;
+}
+
+.page-guide .guide-price-card.is-estimated.is-active {
+  border-color: var(--signal-violet);
+  border-style: dashed;
+  box-shadow: var(--lift-paper), 0 0 0 2px rgba(125, 113, 255, 0.35);
+  outline: none;
+}
+
+.guide-swipe {
+  max-width: 420px;
+  overflow-x: clip;
+}
+
+.guide-price-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.page-guide .guide-price-card {
+  color: inherit;
+  cursor: pointer;
+  display: block;
+  font: inherit;
+  padding: 20px;
+  text-align: left;
+  transition: opacity var(--press-ms) var(--ease-out), transform var(--press-ms) var(--ease-out);
+  width: 100%;
+}
+
+.page-guide .guide-price-card.is-estimated {
+  border-style: dashed;
+}
+
+.page-guide .guide-price-card.is-quiet {
+  opacity: 0.58;
+  transform: scale(0.985);
+}
+
+.page-guide .guide-price-card.is-active {
+  box-shadow: var(--lift-press);
+  outline: 2px solid var(--signal-violet);
+  outline-offset: 2px;
+}
+
+.page-guide .guide-price-card .guide-price-title,
+.page-guide .guide-price-card h2 {
+  display: block;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 1.05;
+  margin: 12px 0;
+}
+
+.page-guide .guide-price-card .package-price {
+  font-size: 26px;
+}
+
+.guide-mode-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 var(--space-4);
+}
+
+.page-guide .guide-chip-on {
+  background: var(--ink-navy);
+  color: var(--paper-ticket);
+}
+
+.guide-check-list {
+  display: grid;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.guide-check {
+  align-items: center;
+  background: var(--paper-ticket);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-control);
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  font-weight: 700;
+  gap: var(--space-3);
+  min-height: var(--touch);
+  padding: 8px 12px;
+  text-align: left;
+  width: 100%;
+}
+
+.guide-check.is-done {
+  background: var(--path-mint);
+  border-color: transparent;
+}
+
+.guide-check-mark {
+  align-items: center;
+  background: var(--paper-raised);
+  border-radius: 999px;
+  display: inline-flex;
+  flex: none;
+  font-size: 12px;
+  font-weight: 800;
+  height: 32px;
+  justify-content: center;
+  letter-spacing: 0.04em;
+  width: 32px;
+}
+
+.guide-check.is-done .guide-check-mark {
+  background: var(--ink-navy);
+}
+
+.guide-check-tick {
+  border-right: 2px solid var(--paper-ticket);
+  border-bottom: 2px solid var(--paper-ticket);
+  display: block;
+  height: 10px;
+  transform: rotate(45deg) translate(-1px, -1px);
+  width: 6px;
+}
+
+.guide-safety {
+  display: grid;
+  gap: var(--space-4);
+  padding: 24px;
+}
+
+.guide-safety .inline-error,
+.guide-safety .warning {
+  margin: 0;
+}
+
+.guide-actions {
+  align-items: center;
+  bottom: 0;
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr);
+  margin: 8px -4px 0;
+  padding: 12px 4px calc(12px + env(safe-area-inset-bottom));
+  position: relative;
+  position: sticky;
+  z-index: 3;
+}
+
+.guide-actions::before {
+  background: var(--paper-ticket);
+  border-top: 1px solid var(--edge);
+  bottom: 0;
+  content: "";
+  left: 50%;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  width: 100vw;
+  z-index: -1;
+}
+
+.guide-actions .button {
+  min-height: 52px;
+  width: 100%;
+}
+
+.guide-home-link {
+  grid-column: 1 / -1;
+  justify-self: center;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .guide-stamps {
+    gap: 4px;
+  }
+
+  .guide-stamp {
+    flex: 1;
+    height: var(--touch);
+    min-width: 0;
+  }
+
+  .guide-stage-mark {
+    font-size: 72px;
+  }
+
+  .page-guide .guide-price-card.is-quiet {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .guide-stage {
+    align-items: start;
+    gap: var(--space-6) var(--space-10);
+    grid-template-areas:
+      "demo head"
+      "demo body";
+    grid-template-columns: minmax(0, 1.08fr) minmax(280px, 0.92fr);
+  }
+
+  .guide-demo {
+    grid-area: demo;
+  }
+
+  .guide-copy-head {
+    grid-area: head;
+  }
+
+  .guide-copy-body {
+    grid-area: body;
+    margin: 0;
+  }
+
+  .guide-swipe {
+    max-width: none;
+  }
+
+  .guide-actions {
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+  }
+}
+
+@media (min-width: 1440px) {
+  .page.page-guide {
+    max-width: 1120px;
+  }
+
+  .guide-stage {
+    gap: var(--space-6) 56px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-guide .guide-price-card {
+    transition: none;
+  }
+
+  .page-guide .guide-price-card.is-quiet {
+    transform: none;
+  }
+}
