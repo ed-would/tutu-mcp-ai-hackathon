@@ -1,4 +1,4 @@
-import { MCP_DURATION_BUDGETS } from "../mcp/tools";
+import { MCP_DURATION_BUDGETS } from "../mcp/tools.js";
 import {
   PackagesRequestSchema,
   extractPayload,
@@ -17,8 +17,8 @@ import {
   type SourceEvidence,
   type SourceWarning,
   type TripPackage,
-} from "./contracts";
-import { packagePriceNote, preferenceSummary, rankPackages } from "./preference";
+} from "./contracts.js";
+import { packagePriceNote, preferenceSummary, rankPackages } from "./preference.js";
 
 type SearchOutcome = { result?: PackageCallResult; error?: unknown };
 type PlannedCall = { key: "avia" | "outbound" | "return" | "hotel"; tool: PackageToolName; args: Record<string, unknown> };

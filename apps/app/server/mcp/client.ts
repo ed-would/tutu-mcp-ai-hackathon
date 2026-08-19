@@ -2,7 +2,7 @@ import {
   Client,
   StreamableHTTPClientTransport,
 } from "@modelcontextprotocol/client";
-import { withMcpRetry } from "./retry";
+import { withMcpRetry } from "./retry.js";
 
 export const TUTU_MCP_ENDPOINT = "https://mcp.tutu.ru/mcp";
 

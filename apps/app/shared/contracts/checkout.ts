@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SourceWarningSchema } from "./common";
+import { SourceWarningSchema } from "./common.js";
 
 const CheckoutRefSchema = z
   .record(z.string(), z.unknown())

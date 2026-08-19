@@ -1,4 +1,4 @@
-import type { HealthDependencyStatus } from "../../shared/contracts/health";
+import type { HealthDependencyStatus } from "../../shared/contracts/health.js";
 
 export const DEFAULT_TUTU_MCP_ENDPOINT = "https://mcp.tutu.ru/mcp";
 

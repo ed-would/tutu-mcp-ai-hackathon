@@ -2,10 +2,10 @@ import {
   interpretRequestSchema,
   type InterpretResponse,
   type InterpretRequest,
-} from "../server/llm/contracts";
-import { fallbackIntent } from "../server/llm/fallback";
-import { generateWithProviders, type FetchLike, type ProviderResult } from "../server/llm/providers";
-import { getRequestId } from "../server/observability/request-id";
+} from "../server/llm/contracts.js";
+import { fallbackIntent } from "../server/llm/fallback.js";
+import { generateWithProviders, type FetchLike, type ProviderResult } from "../server/llm/providers.js";
+import { getRequestId } from "../server/observability/request-id.js";
 
 const MAX_BODY_BYTES = 16 * 1024;
 

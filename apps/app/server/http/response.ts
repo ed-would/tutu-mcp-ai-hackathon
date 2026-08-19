@@ -1,5 +1,5 @@
-import type { ApiError } from "../../shared/contracts/common";
-import { getRequestId } from "../observability/request-id";
+import type { ApiError } from "../../shared/contracts/common.js";
+import { getRequestId } from "../observability/request-id.js";
 
 export function jsonResponse(body: unknown, status = 200, requestId?: string): Response {
   return new Response(JSON.stringify(body), {

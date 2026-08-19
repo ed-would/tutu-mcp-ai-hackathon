@@ -1,4 +1,4 @@
-import { generatedOutputSchema, type GeneratedOutput, type InterpretRequest } from "./contracts";
+import { generatedOutputSchema, type GeneratedOutput, type InterpretRequest } from "./contracts.js";
 
 export const NEURALDEEP_BASE_URL = "https://api.neuraldeep.ru/v1";
 export const YANDEX_BASE_URL = "https://ai.api.cloud.yandex.net/v1";

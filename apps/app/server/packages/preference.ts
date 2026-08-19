@@ -1,4 +1,4 @@
-import { preferenceSummary, rankPackages, seedUnit } from "../../shared/prefs";
+import { preferenceSummary, rankPackages, seedUnit } from "../../shared/prefs.js";
 
 const ESTIMATED_NOTE = "Два отдельных билета; цена может измениться";
 const PARTIAL_NOTE = "Два отдельных билета или неполный ответ; цена может измениться";

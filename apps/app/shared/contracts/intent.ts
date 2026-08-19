@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PreferenceVectorSchema } from "./common";
+import { PreferenceVectorSchema } from "./common.js";
 
 const DateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD dates.");
 

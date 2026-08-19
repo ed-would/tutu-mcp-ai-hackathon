@@ -1,11 +1,11 @@
 import {
   closeTutuMcp,
   connectTutuMcp,
-} from "../mcp/client";
-import { MCP_DURATION_BUDGETS } from "../mcp/tools";
-import { withMcpRetry } from "../mcp/retry";
-import type { CheckoutRef, CheckoutResponse, CheckoutStep, CheckoutStepProduct } from "./validation";
-import { CheckoutPayloadError, normalizeCheckoutPayload } from "./validation";
+} from "../mcp/client.js";
+import { MCP_DURATION_BUDGETS } from "../mcp/tools.js";
+import { withMcpRetry } from "../mcp/retry.js";
+import type { CheckoutRef, CheckoutResponse, CheckoutStep, CheckoutStepProduct } from "./validation.js";
+import { CheckoutPayloadError, normalizeCheckoutPayload } from "./validation.js";
 
 /** URL builder is local on Tutu's side — keep this well under the 20s route cap. */
 export const CHECKOUT_TIMEOUT_MS = 5_000;

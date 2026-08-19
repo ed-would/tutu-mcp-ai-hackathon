@@ -17,7 +17,7 @@ High-level layout for the Tutu MCP hackathon project. Coding rules live in [type
 
 ## Application (`apps/app`)
 
-Vite + React + TypeScript in `apps/app/`, with Vercel-compatible functions under `apps/app/api/` and shared server contracts in `server/` and `shared/`.
+Vite + React + TypeScript in `apps/app/`, with Vercel-compatible functions under `apps/app/api/` and shared server contracts in `server/` and `shared/`. Vercel transpiles those functions as native ESM (no bundler), so relative imports in `api/`, `server/`, and `shared/` must use `.js` specifiers.
 
 ### Backend routes
 

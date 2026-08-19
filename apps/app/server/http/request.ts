@@ -1,7 +1,7 @@
 import { z } from "zod";
-import type { ApiError } from "../../shared/contracts/common";
-import { getRequestId } from "../observability/request-id";
-import { jsonResponse } from "./response";
+import type { ApiError } from "../../shared/contracts/common.js";
+import { getRequestId } from "../observability/request-id.js";
+import { jsonResponse } from "./response.js";
 
 export const MAX_JSON_BODY_BYTES = 16 * 1024;
 

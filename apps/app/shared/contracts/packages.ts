@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SourceEvidenceSchema, SourceWarningSchema } from "./common";
+import { SourceEvidenceSchema, SourceWarningSchema } from "./common.js";
 
 export const PackagePriceSchema = z.discriminatedUnion("confidence", [
   z.object({

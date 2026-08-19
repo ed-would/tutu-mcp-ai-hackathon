@@ -1,7 +1,7 @@
-import type { HealthResponse } from "../shared/contracts/health";
-import { MCP_DURATION_BUDGETS, mcpToolFingerprint } from "../server/mcp/tools";
-import { getRequestId } from "../server/observability/request-id";
-import { getLlmStatus, getMcpStatus } from "../server/observability/readiness";
+import type { HealthResponse } from "../shared/contracts/health.js";
+import { MCP_DURATION_BUDGETS, mcpToolFingerprint } from "../server/mcp/tools.js";
+import { getRequestId } from "../server/observability/request-id.js";
+import { getLlmStatus, getMcpStatus } from "../server/observability/readiness.js";
 
 function jsonResponse(body: unknown, status = 200, requestId?: string): Response {
   return new Response(JSON.stringify(body), {

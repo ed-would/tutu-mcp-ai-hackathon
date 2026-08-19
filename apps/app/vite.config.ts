@@ -5,6 +5,7 @@ import react from "@vitejs/plugin-react";
 type ApiHandler = (request: Request) => Promise<Response>;
 
 const localApiRoutes: Record<string, { module: string; exportName: string }> = {
+  "/api/health": { module: "/api/health.ts", exportName: "healthHandler" },
   "/api/interpret": { module: "/api/interpret.ts", exportName: "interpretHandler" },
   "/api/packages": { module: "/api/packages.ts", exportName: "packagesHandler" },
   "/api/checkout": { module: "/api/checkout.ts", exportName: "checkoutHandler" },

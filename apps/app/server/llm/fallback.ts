@@ -1,4 +1,4 @@
-import { partyFromAnswers } from "../../shared/party";
+import { partyFromAnswers } from "../../shared/party.js";
 import {
   type ClarificationQuestion,
   type DestinationIdea,
@@ -6,7 +6,7 @@ import {
   type GeneratedReady,
   type InterpretRequest,
   type TravelIntent,
-} from "./contracts";
+} from "./contracts.js";
 
 const KNOWN_CITIES = [
   "Москва", "Санкт-Петербург", "Казань", "Екатеринбург", "Новосибирск", "Сочи", "Минеральные Воды", "Владивосток",

@@ -1,8 +1,8 @@
-import { closeTutuMcp, connectTutuMcp } from "../server/mcp/client";
-import { withMcpRetry } from "../server/mcp/retry";
-import { getRequestId } from "../server/observability/request-id";
-import { buildPackagesResponse } from "../server/packages/orchestrator";
-import { getSearchInputs, PackagesRequestSchema, type PackageCallResult, type PackageToolName } from "../server/packages/contracts";
+import { closeTutuMcp, connectTutuMcp } from "../server/mcp/client.js";
+import { withMcpRetry } from "../server/mcp/retry.js";
+import { getRequestId } from "../server/observability/request-id.js";
+import { buildPackagesResponse } from "../server/packages/orchestrator.js";
+import { getSearchInputs, PackagesRequestSchema, type PackageCallResult, type PackageToolName } from "../server/packages/contracts.js";
 
 export const MAX_PACKAGES_BODY_BYTES = 16 * 1024;
 

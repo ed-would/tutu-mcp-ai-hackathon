@@ -9,7 +9,7 @@ import {
   type DestinationIdea,
   type InterpretRequest,
   type TravelIntent,
-} from "../../shared/contracts/intent";
+} from "../../shared/contracts/intent.js";
 
 export const clarificationQuestionSchema = ClarificationQuestionSchema;
 export const hotelPreferencesSchema = HotelPreferencesSchema;

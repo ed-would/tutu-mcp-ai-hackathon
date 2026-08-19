@@ -1,4 +1,4 @@
-import { getRequestId } from "../server/observability/request-id";
+import { getRequestId } from "../server/observability/request-id.js";
 import {
   CheckoutMcpError,
   CheckoutPayloadError,
@@ -7,9 +7,9 @@ import {
   type CheckoutErrorBody,
   type CheckoutRef,
   type CheckoutStep,
-} from "../server/checkout/validation";
-import { createCheckoutLink, createCheckoutSteps, toCheckoutStep } from "../server/checkout/service";
-import { parseJsonBody } from "../server/http/request";
+} from "../server/checkout/validation.js";
+import { createCheckoutLink, createCheckoutSteps, toCheckoutStep } from "../server/checkout/service.js";
+import { parseJsonBody } from "../server/http/request.js";
 
 type CheckoutLinkResult = {
   url: string;
