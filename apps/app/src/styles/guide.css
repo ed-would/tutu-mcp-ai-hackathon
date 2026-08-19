@@ -1,7 +1,6 @@
 .page.page-guide {
   margin: 0 auto;
   max-width: 1080px;
-  overflow-x: clip;
   padding-bottom: calc(12px + env(safe-area-inset-bottom));
   width: 100%;
 }
@@ -43,6 +42,7 @@
   justify-content: space-between;
   list-style: none;
   margin: 0 0 var(--space-2);
+  overflow-x: clip;
   padding: 0;
   position: relative;
 }
@@ -183,8 +183,12 @@
   z-index: 2;
 }
 
-.page-guide .clarify-card .quick-prompts {
-  margin: 8px 0 4px;
+.page-guide .guide-demo-card .clarify-card {
+  margin-top: 4px;
+}
+
+.page-guide .guide-demo .date-picker-popover {
+  z-index: 8;
 }
 
 .page-guide .guide-price-card.is-exact.is-active {

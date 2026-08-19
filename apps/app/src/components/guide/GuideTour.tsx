@@ -24,7 +24,9 @@ export function GuideTour() {
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
-      if (event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLInputElement) return;
+      if (event.target instanceof HTMLElement) {
+        if (event.target.closest("input, textarea, select, .date-picker, .clarify-card")) return;
+      }
       if (event.key === "ArrowRight") {
         event.preventDefault();
         go(stage + 1);

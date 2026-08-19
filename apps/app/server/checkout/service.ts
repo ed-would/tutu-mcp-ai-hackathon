@@ -7,7 +7,9 @@ import { withMcpRetry } from "../mcp/retry";
 import type { CheckoutRef, CheckoutResponse, CheckoutStep, CheckoutStepProduct } from "./validation";
 import { CheckoutPayloadError, normalizeCheckoutPayload } from "./validation";
 
-export const CHECKOUT_TIMEOUT_MS = MCP_DURATION_BUDGETS.mcpCallMs;
+/** URL builder is local on Tutu's side — keep this well under the 20s route cap. */
+export const CHECKOUT_TIMEOUT_MS = 5_000;
+export const CHECKOUT_ROUTE_BUDGET_MS = MCP_DURATION_BUDGETS.routeMs;
 
 type CheckoutLink = Omit<CheckoutResponse, "requestId" | "steps">;
 
@@ -64,29 +66,41 @@ export async function createCheckoutLink(checkoutRef: CheckoutRef): Promise<Omit
 }
 
 /** Resolve one or more opaque checkout refs into ordered booking steps. */
-export async function createCheckoutSteps(refs: CheckoutRef[]): Promise<Omit<CheckoutResponse, "requestId">> {
+export async function createCheckoutSteps(
+  refs: CheckoutRef[],
+  options: { now?: () => number; routeBudgetMs?: number } = {},
+): Promise<Omit<CheckoutResponse, "requestId">> {
   if (refs.length === 0) {
     throw new CheckoutPayloadError("VALIDATION_ERROR", "A valid checkoutRef is required.", false);
   }
 
+  const now = options.now ?? Date.now;
+  const routeBudgetMs = options.routeBudgetMs ?? CHECKOUT_ROUTE_BUDGET_MS;
+  const started = now();
   let connection: Awaited<ReturnType<typeof connectTutuMcp>> | undefined;
   try {
     connection = await connectTutuMcp();
     const steps: CheckoutStep[] = [];
     for (const [index, ref] of refs.entries()) {
-      const link = await callCheckoutLink(connection, ref);
-      steps.push(toCheckoutStep(ref, link, index, refs.length));
+      if (now() - started >= routeBudgetMs) break;
+      try {
+        const link = await callCheckoutLink(connection, ref);
+        steps.push(toCheckoutStep(ref, link, index, refs.length));
+      } catch {
+        // One failed URL must not drop remaining hotel/return steps.
+      }
     }
-    const first = steps[0];
+    const ordered = steps.map((step, index) => ({ ...step, order: index + 1 }));
+    const first = ordered[0];
     if (!first) {
-      throw new CheckoutPayloadError("MCP_INVALID_RESPONSE", "Tutu returned no checkout or fallback URL.", false);
+      throw new CheckoutPayloadError("MCP_INVALID_RESPONSE", "Tutu returned no checkout or fallback URL.", true);
     }
     return {
       url: first.url,
       kind: first.kind ?? "deeplink",
       ...(first.fallbackUrl ? { fallbackUrl: first.fallbackUrl } : {}),
       ...(first.note ? { note: first.note } : {}),
-      steps,
+      steps: ordered,
     };
   } finally {
     try {

@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { connectTutuMcp } from "../server/mcp/client";
 import { isRetryableMcpError, withMcpRetry } from "../server/mcp/retry";
 
 describe("MCP retry", () => {
@@ -24,5 +25,14 @@ describe("MCP retry", () => {
     expect(isRetryableMcpError({ status: 429 })).toBe(true);
     expect(isRetryableMcpError({ status: 503 })).toBe(true);
     expect(isRetryableMcpError(new Error("bad payload"))).toBe(false);
+  });
+
+  it("retries a retry-safe MCP connect failure once", async () => {
+    const connection = { client: {}, transport: {} };
+    const open = vi.fn()
+      .mockRejectedValueOnce({ status: 503 })
+      .mockResolvedValueOnce(connection);
+    await expect(connectTutuMcp(open)).resolves.toBe(connection);
+    expect(open).toHaveBeenCalledTimes(2);
   });
 });

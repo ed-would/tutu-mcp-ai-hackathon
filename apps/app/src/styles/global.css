@@ -1693,7 +1693,8 @@ a:focus-visible {
 @media (min-width: 721px) {
   .postcard-sky.has-desktop-photo {
     background: var(--paper-ticket);
-    height: 320px;
+    height: auto;
+    overflow: visible;
   }
 
   .postcard-sky.has-desktop-photo .postcard-fold,
@@ -1705,11 +1706,9 @@ a:focus-visible {
 
   .postcard-sky.has-desktop-photo .postcard-photo {
     display: block;
-    height: 100%;
-    inset: 0;
-    object-fit: cover;
-    object-position: center 36%;
-    position: absolute;
+    height: auto;
+    object-fit: contain;
+    position: static;
     width: 100%;
   }
 

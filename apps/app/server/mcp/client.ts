@@ -2,6 +2,7 @@ import {
   Client,
   StreamableHTTPClientTransport,
 } from "@modelcontextprotocol/client";
+import { withMcpRetry } from "./retry";
 
 export const TUTU_MCP_ENDPOINT = "https://mcp.tutu.ru/mcp";
 
@@ -9,6 +10,8 @@ export type TutuMcpConnection = {
   client: Client;
   transport: StreamableHTTPClientTransport;
 };
+
+export type OpenTutuMcp = () => Promise<TutuMcpConnection>;
 
 /** Create an unconnected Tutu MCP client and its per-request transport. */
 export function createTutuMcpConnection(
@@ -21,9 +24,8 @@ export function createTutuMcpConnection(
   return { client, transport };
 }
 
-/** Connect a fresh client. Call closeTutuMcp in a finally block. */
-export async function connectTutuMcp(
-): Promise<TutuMcpConnection> {
+/** Open one MCP session. Failures close the transport before they propagate. */
+export async function openTutuMcpConnection(): Promise<TutuMcpConnection> {
   const connection = createTutuMcpConnection();
   try {
     await connection.client.connect(connection.transport, { timeout: 12_000 });
@@ -36,6 +38,13 @@ export async function connectTutuMcp(
     }
     throw error;
   }
+}
+
+/** Connect a fresh client. Call closeTutuMcp in a finally block. */
+export async function connectTutuMcp(
+  open: OpenTutuMcp = openTutuMcpConnection,
+): Promise<TutuMcpConnection> {
+  return withMcpRetry(open);
 }
 
 /** Close the transport without masking the original failure. */
