@@ -30,16 +30,16 @@ function Header() {
 
   return (
     <header className="site-header">
-      <Link className="wordmark" to="/" aria-label="Travel Tinder home">
-        <span className="wordmark-mark" aria-hidden="true">T</span>
-        <span>Travel Tinder</span>
+      <Link className="wordmark" to="/" aria-label="Туту Куда? — на главную">
+        <span className="wordmark-mark" aria-hidden="true">Т</span>
+        <span>Туту Куда?</span>
       </Link>
       <nav className="primary-nav" aria-label="Primary navigation">
-        <NavLink className={getNavClass} to="/discover">Discover</NavLink>
-        <NavLink className={getNavClass} to="/guide">Guide</NavLink>
+        <NavLink className={getNavClass} to="/discover">Маршрут</NavLink>
+        <NavLink className={getNavClass} to="/guide">Как это работает</NavLink>
       </nav>
       <span className="route-thread" aria-live="polite">
-        {location.pathname === "/discover" ? "Your route · 01" : location.pathname === "/guide" ? "Your route · guide" : "Your route · start"}
+        {location.pathname === "/discover" ? "ваш маршрут · 01" : location.pathname === "/guide" ? "ваш маршрут · гид" : "ваш маршрут · старт"}
       </span>
     </header>
   );
@@ -48,9 +48,9 @@ function Header() {
 function Footer() {
   return (
     <footer className="site-footer">
-      <span>Travel ideas shaped around you.</span>
+      <span>Поездки, собранные вокруг вас.</span>
       <span className="footer-dot" aria-hidden="true">·</span>
-      <span>Powered by Tutu MCP</span>
+      <span>На базе Туту MCP</span>
     </footer>
   );
 }

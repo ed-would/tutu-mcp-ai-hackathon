@@ -86,8 +86,8 @@ function extractParty(request: InterpretRequest): { adults?: number; childrenAge
     ? [...childrenValue.matchAll(/\d+/g)].map((match) => Number(match[0])).filter((age) => age <= 17)
     : [...text.matchAll(/(?:дет(?:ей|и)|children)[^\d]*(\d{1,2})/gi)].map((match) => Number(match[1])).filter((age) => age <= 17);
   if (Number.isFinite(adults) && adults > 0) return { adults, childrenAges: ages };
-  if (/вдво[её]м|нас двое|мы двое|for two/i.test(text)) return { adults: 2, childrenAges: [] };
-  if (/один|одна|solo|alone/i.test(text)) return { adults: 1, childrenAges: [] };
+  if (/вдво[её]м|нас двое|мы двое|двое\s+взросл|for two/i.test(text)) return { adults: 2, childrenAges: [] };
+  if (/один\s+взросл|одна\s+взросл|еду один|еду одна|solo|alone/i.test(text)) return { adults: 1, childrenAges: [] };
   return { childrenAges: ages };
 }
 

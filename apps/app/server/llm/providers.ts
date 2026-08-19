@@ -6,7 +6,7 @@ const NEURALDEEP_TIMEOUT_MS = 15_000;
 const YANDEX_TIMEOUT_MS = 30_000;
 
 type Env = Record<string, string | undefined>;
-export type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+export type FetchLike = (input: string | URL | Request, init?: RequestInit) => Promise<Response>;
 
 export type ProviderOptions = {
   fetchImpl?: FetchLike;

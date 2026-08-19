@@ -1,5 +1,9 @@
 # Мой проект: Tutu travel tinder tech
 
+Приложение уже запущено: ниже рабочие ссылки на онбординг и интерактивное демо.
+- Пройдите онбординг: [гид](https://tutu-mcp-ai-hackathon.vercel.app/guide)
+- Интерактивный флоу подбора поездки с свайпой и карточками идей: [Discover](https://tutu-mcp-ai-hackathon.vercel.app/discover)
+
 **tutu travel tinder tech** — mobile-first swipe-сервис для подбора поездок на [Tutu MCP](https://mcp.tutu.ru/mcp): свободный текст → карточки-идеи с обучением на лайках → живые пакеты (транспорт + отели) → checkout на [tutu.ru](https://www.tutu.ru/). 
 
 ---
