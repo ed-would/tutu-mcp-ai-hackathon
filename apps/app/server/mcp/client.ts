@@ -29,7 +29,11 @@ export async function connectTutuMcp(
     await connection.client.connect(connection.transport, { timeout: 12_000 });
     return connection;
   } catch (error) {
-    await closeTutuMcp(connection);
+    try {
+      await closeTutuMcp(connection);
+    } catch {
+      // Preserve the original connection failure.
+    }
     throw error;
   }
 }
