@@ -17,7 +17,7 @@ export function SiteFooter() {
           <span className="footer-brand">
             <img
               className="footer-tutu-mark"
-              src="/logo.png"
+              src="/logo-tutu.png"
               alt="Туту"
               width={930}
               height={260}
