@@ -10,9 +10,8 @@
       "2025-11-25"
     ],
     "transport": "streamable-http",
-    "version": "0.26.0",
-    "git_sha": "unknown",
-    "process_uptime_sec": 10589.7
+    "version": "0.38.0",
+    "git_sha": "unknown"
   },
   "_note": "Reachability snapshot for the upstreams the server actually uses. Each probe carries a `meaning` line spelling out what the status_code implies — DO read it before drawing conclusions. State semantics:\n- `ok` — endpoint behaved as expected (2xx, or the expected 404 on a root probe whose host has no GET handlers because all real endpoints are POST).\n- `reachable` — host answered but with an unexpected 4xx (e.g. 403 ban, 410 removed, 429 rate-limit, or a non-404 root). Likely actionable: tool calls against this endpoint may already be broken — inspect.\n- `unhealthy` — 5xx; real upstream issue.\n- `unreachable` — network failure (DNS/TCP/TLS/timeout).\nMost probes are reachability-only (a GET that proves the host answers). The `offers-api-avia-search` probe is functional: it fires a REAL one-way `POST /avia/offers` and carries `elapsed_ms`, so an `ok` here means avia search is actually answering (not just that the host is up), and a rising `elapsed_ms` is an early warning that heavier round-trip searches may start timing out.\nUse `tutu://version` for build/code-freshness details.",
   "upstreams": [
@@ -63,8 +62,9 @@
       "url": "https://offers-api.tutu.ru/avia/offers",
       "state": "ok",
       "http_status": 200,
-      "elapsed_ms": 793,
-      "meaning": "real POST /avia/offers answered 200 in 793ms (~43 offers) — avia search path is live"
+      "elapsed_ms": 700,
+      "meaning": "real POST /avia/offers answered 200 in 700ms (~47 offers) — avia search path is live"
     }
-  ]
+  ],
+  "_fetched": "2026-08-19"
 }
