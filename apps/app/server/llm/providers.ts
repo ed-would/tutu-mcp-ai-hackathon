@@ -194,7 +194,7 @@ export async function generateWithProviders(
         `${YANDEX_BASE_URL}/responses`,
         { authorization: `Api-Key ${yandexKey}`, "x-folder-id": folderId },
         {
-          model: env.YANDEX_MODEL?.trim() || `gpt://${folderId}/qwen3.6-35b-a3b`,
+          model: env.YC_MODEL?.trim() || env.YANDEX_MODEL?.trim() || `gpt://${folderId}/qwen3.6-35b-a3b`,
           input: prompt,
           temperature: 0.2,
           // Reasoning-capable Yandex models count hidden reasoning in this
