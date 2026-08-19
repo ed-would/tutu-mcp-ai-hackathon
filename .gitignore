@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+out/
+build/
+.next/
+*.tsbuildinfo
+
+# IDE and OS
+.DS_Store
+*.log
+Thumbs.db
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Test and coverage
+coverage/
+**/coverage/
+*.lcov
+
+# Local editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/settings.json
+
+# Package manager debug logs
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.tmp-research/

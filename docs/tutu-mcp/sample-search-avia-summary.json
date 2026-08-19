@@ -1,0 +1,71 @@
+{
+  "keys": [
+    "offers",
+    "meta"
+  ],
+  "offers_count": 2,
+  "meta": {
+    "transport": "avia",
+    "from": {
+      "name": "Москва",
+      "geo_id": "2657260",
+      "region": "Москва город федерального значения",
+      "iata": "MOW"
+    },
+    "to": {
+      "name": "Санкт-Петербург",
+      "geo_id": "2656915",
+      "region": "Санкт-Петербург город федерального значения",
+      "iata": "LED"
+    },
+    "round_trip": false,
+    "return_date": null,
+    "sort": "price_asc",
+    "page": 1,
+    "page_size": 2,
+    "total_returned": 2,
+    "total_matched": 49,
+    "total_matched_exact": true,
+    "has_more": true,
+    "post_filter_dropped_over_cap": 0,
+    "post_filter_dropped_not_direct": 0,
+    "post_filter_dropped_wrong_carrier": 0,
+    "carriers_available": [
+      {
+        "name": "Аэрофлот",
+        "offers_count": 42,
+        "price_from": 3325.0
+      },
+      {
+        "name": "Победа",
+        "offers_count": 4,
+        "price_from": 4056.0
+      },
+      {
+        "name": "S7 Airlines",
+        "offers_count": 3,
+        "price_from": 5154.0
+      }
+    ],
+    "upstream_note": null
+  },
+  "first_offer_keys": [
+    "offer_id",
+    "transport",
+    "price",
+    "duration_min",
+    "carriers",
+    "search_results_url",
+    "segments_count",
+    "departure_at",
+    "arrival_at",
+    "legs",
+    "variants",
+    "checkout_ref",
+    "review_summary"
+  ],
+  "first_price": {
+    "amount": 3325.0,
+    "currency": "RUB"
+  }
+}

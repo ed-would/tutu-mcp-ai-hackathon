@@ -1,0 +1,28 @@
+{
+  "name": "tutu-mcp-server",
+  "version": "0.26.0",
+  "git_sha": "unknown",
+  "python": "3.12.13",
+  "process_uptime_sec": 10590.0,
+  "tool_count": 16,
+  "tool_names": [
+    "create_checkout_link",
+    "fetch_resource",
+    "get_avia_instructions",
+    "get_bus_instructions",
+    "get_etrain_instructions",
+    "get_hotels_instructions",
+    "get_multitransport_instructions",
+    "get_offer_details",
+    "get_rail_instructions",
+    "get_rail_seatmap",
+    "search_avia",
+    "search_bus",
+    "search_etrain",
+    "search_hotels",
+    "search_multitransport",
+    "search_rail"
+  ],
+  "schema_fingerprint": "89a1c08e42a41c11",
+  "_hint": "If `schema_fingerprint` didn't change after a deployment, the server may still be running the previous code and needs to be redeployed to refresh it."
+}

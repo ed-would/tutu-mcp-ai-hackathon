@@ -1,0 +1,20 @@
+---
+description: Markdown structure and link conventions for Markdown files
+globs: "**/*.md"
+alwaysApply: false
+---
+
+# Markdown style
+
+- **Owner:** Project maintainers
+- **Status:** Active
+- **Scope:** Markdown structure and documentation-link conventions
+- **Last reviewed:** 2026-08-12
+
+- Start each document with one `#` heading and increase heading levels one step at a time.
+- Use `-` for unordered lists and sequential numbers for ordered lists.
+- Declare a language on every fenced code block (`bash`, `json`, `typescript`, `text`, and so on).
+- Use real headings instead of bold text as a heading; avoid duplicate sibling headings unless repetition is intentional (for example, a changelog).
+- Keep Markdown tables rectangular and escape `|` characters inside cells.
+- Make documentation link targets relative to the file containing the link.
+- In visible prose and code spans, show paths from the repository root (for example, `specs/domain/entities.md`).

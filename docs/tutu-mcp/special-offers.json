@@ -1,0 +1,27 @@
+{
+  "_note": "Random demo offers. Dates are randomized at request time. Not a live price feed.",
+  "offers": [
+    {
+      "destination": {
+        "name": "Москва",
+        "geo_id": "2657260"
+      },
+      "check_in": "2026-08-11",
+      "check_out": "2026-08-14",
+      "nights": 3,
+      "tag": "weekend",
+      "hint": "Try `search_hotels` with city_name='Москва', check_in='2026-08-11', check_out='2026-08-14'."
+    },
+    {
+      "destination": {
+        "name": "Санкт-Петербург",
+        "geo_id": "2656915"
+      },
+      "check_in": "2026-09-13",
+      "check_out": "2026-09-15",
+      "nights": 2,
+      "tag": "long weekend",
+      "hint": "Try `search_hotels` with city_name='Санкт-Петербург', check_in='2026-09-13', check_out='2026-09-15'."
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+# Dependencies
+**/node_modules/
+
+# Build outputs
+**/dist/
+**/build/
+**/.next/
+**/*.tsbuildinfo
+
+# IDE and OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Test and coverage
+**/coverage/

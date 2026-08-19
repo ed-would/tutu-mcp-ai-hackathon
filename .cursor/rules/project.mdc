@@ -1,0 +1,48 @@
+---
+description: Development rules for the Tutu MCP hackathon project
+alwaysApply: true
+---
+
+# Tutu MCP Hack — Project Rules
+
+Hackathon project integrating [Tutu MCP](https://mcp.tutu.ru/mcp). `docs/tutu-mcp/` — API reference; application code lives at repo root or in agreed subfolders (see [docs/agents/architecture.md](../../docs/agents/architecture.md)).
+
+## Key Convention
+
+- Use named exports for all functions and classes (when writing TypeScript/JavaScript modules).
+
+## Dependencies
+
+- Use **stable** releases only in `package.json` (no `alpha`, `beta`, `rc`, or other prerelease dist-tags) unless the team explicitly approves an exception.
+
+## Documentation Language
+
+- **Agent-facing docs** (`docs/**/*.md`, `AGENTS.md`, `.cursor/**/*.md`) **MUST be written in English**.
+- **README.md** and user-facing hackathon copy may stay in **Russian** unless the team decides otherwise.
+- Russian (or other languages) in agent docs only when explicitly requested for a specific document or section.
+
+## Documentation Links
+
+- In Markdown under `docs/**`, link targets **MUST** be **relative to the file that contains the link** (for example from `docs/agents/foo.md` use `../tutu-mcp/tutu-mcp.md`, `../../AGENTS.md`, `../../.cursor/rules/project.mdc`).
+- From the **repository root** (`README.md`, `AGENTS.md`) or paths outside `docs/`, you may use paths from the repo root (for example `docs/agents/verification.md`, `docs/tutu-mcp/tutu-mcp.md`).
+
+### Visible file paths in prose
+
+- In link **text**, fenced or inline **code**, and plain prose, show repository paths **from the repository root** (for example `docs/tutu-mcp/tutu-mcp.md`, `docs/agents/verification.md`). Do **not** show climb-out segments such as `../tutu-mcp/...` in what the reader sees.
+- Link **targets** (`href`) remain relative to the containing file under `docs/**` as above.
+
+## Protected Contracts
+
+Never change without explicit team agreement:
+
+- Tutu MCP endpoint: `https://mcp.tutu.ru/mcp` (remote / Streamable HTTP, no auth).
+- Canonical MCP reference: `docs/tutu-mcp/tutu-mcp.md` and companion JSON/playbook files under `docs/tutu-mcp/`.
+- Hackathon submission freeze: no repo changes after **21:00 MSK, 19 August 2026** (see [README.md](../../README.md)).
+
+## Skill
+
+Invoke `.cursor/skills/project-core/SKILL.md` and follow its *When to use* / *When NOT to use* sections.
+
+## Verification
+
+See `docs/agents/verification.md` — single source for when to run build/test/lint and when documentation-only work can skip the suite.
