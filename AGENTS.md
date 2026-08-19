@@ -6,7 +6,16 @@ Primary context: [README.md](README.md) (hackathon brief, dates, judging criteri
 
 ## Commands
 
-**App not yet scaffolded.** Commands will be added here once `apps/app` is initialised.
+The Vite + React + TypeScript app lives in `apps/app/` and deploys through Vercel-compatible functions.
+
+Application checks (from the repository root):
+
+```bash
+npm run --prefix apps/app typecheck
+npm run --prefix apps/app build
+npm run --prefix apps/app test
+npm run --prefix apps/app mcp-smoke
+```
 
 **MCP smoke test** (curl + jq, no app):
 
@@ -43,7 +52,7 @@ curl -s https://mcp.tutu.ru/mcp -H 'Content-Type: application/json' \
 | Logging, errors, JSON parsing, security | [docs/agents/logging-validation-and-security.md](docs/agents/logging-validation-and-security.md) |
 | Layout of app code, docs, MCP reference | [docs/agents/architecture.md](docs/agents/architecture.md)                                       |
 | Tutu MCP endpoint, tools, playbooks     | [docs/agents/mcp-integration.md](docs/agents/mcp-integration.md)                                 |
-| Travel Tinder MVP plan                  | [docs/agents/architecture.md](docs/agents/architecture.md) (scaffolding pending)                 |
+| Travel Tinder execution plans           | [docs/plans/travel-tinder-exec-roadmap.md](docs/plans/travel-tinder-exec-roadmap.md)              |
 | Judging criteria and scoring            | [docs/agents/judging-criteria.md](docs/agents/judging-criteria.md)                               |
 
 
@@ -52,4 +61,3 @@ Short index: [docs/agents/README.md](docs/agents/README.md).
 
 
 - **External DeepSeek delegation:** for bounded read-only exploration, research, review, validation, security analysis, or independent critique, load the matching `deepseek-`* repository skill under `.agents/skills/`; keep repository writes, conflict resolution, and final approval with the parent agent.
-

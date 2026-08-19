@@ -10,14 +10,14 @@ High-level layout for the Tutu MCP hackathon project. Coding rules live in [type
 | `docs/tutu-mcp/` | Live Tutu MCP reference: overview, tools JSON, playbooks, sample payloads |
 | `docs/agents/` | Progressive-disclosure instructions for AI agents (`AGENTS.md` index) |
 | `docs/plans/` | Planning docs — standards, standards-cursor, templates (see below) |
-| `apps/app/` | **Application root** — Travel Tinder web app (not yet scaffolded) |
+| `apps/app/` | **Application root** — Vite + React + TypeScript Travel Tinder app, deployed with Vercel |
 | `specs/` | ADRs, architecture specs, domain specs, feature specs, fixtures |
 | `.cursor/` | Rules, skills, agents, commands for Cursor automation |
 | `AGENTS.md` | Compact agent entry point at repo root |
 
 ## Application (`apps/app`)
 
-Not yet scaffolded. **Stack not decided** — choose before initialising the app directory.
+The initial scaffold is in place: Vite + React + TypeScript in `apps/app/`, with Vercel-compatible functions under `apps/app/api/` and shared server contracts in `server/` and `shared/`.
 
 ## MCP reference (`docs/tutu-mcp/`)
 
@@ -74,7 +74,7 @@ tutu-mcp-hack/
 ├── README.md
 ├── AGENTS.md
 ├── apps/
-│   └── app/          # Travel Tinder web app (stack TBD)
+│   └── app/          # Vite + React + TypeScript Travel Tinder web app
 ├── docs/tutu-mcp/
 ├── docs/
 │   ├── README.md

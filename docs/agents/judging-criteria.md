@@ -20,7 +20,7 @@ Source: [hackathon-rules.md](../rules/hackathon-rules.md). Deadline: **21:20 MSK
 | Depth — functional coverage | 15 | Idea Deck + Package Deck + Match detail; preference engine; real MCP calls (`searchMultitransport`, `searchAvia`, `searchHotels`, `create_checkout_link`) | ☐ |
 | UX/UI quality | 20 | Mobile-first `PhoneShell`; Tutu brand tokens; swipe without drag; RU copy; loading/empty states | ☐ |
 | Presentation | 5 | 10-min pitch; four required blocks covered; live demo | ☐ |
-| Documentation — AI-checked | 10 | `docs/plans/tinder/*`, `docs/tutu-mcp/`, `docs/agents/`, `AGENTS.md`; interactive onboarding in app | ☐ |
+| Documentation — AI-checked | 10 | `docs/plans/product-travel-tinder.md`, `docs/plans/travel-tinder-exec-*.md`, `docs/tutu-mcp/`, `docs/agents/`, `AGENTS.md`; interactive onboarding in app | ☐ |
 | Innovation | 10 | Visible preference learning (`PrefMeter`); LLM structured output; ε-greedy ranking | ☐ |
 | Stability | 10 | Fallbacks (`fallbackIntent`), `/health`, timeouts; smoke tests pass; PW gates pass | ☐ |
 
@@ -28,7 +28,7 @@ Source: [hackathon-rules.md](../rules/hackathon-rules.md). Deadline: **21:20 MSK
 
 | Criterion | Pts | What satisfies it | Status |
 | --------- | --- | ----------------- | ------ |
-| Architecture — AI-checked | 10 | Clear server/client split; server-only MCP/LLM; Route Handlers for all external APIs; see [architecture.md](architecture.md) | ☐ |
+| Architecture — AI-checked | 10 | Clear server/client split; server-only MCP/LLM; Vercel-compatible API handlers for all external APIs; see [architecture.md](architecture.md) | ☐ |
 | Code quality — AI-checked | 10 | Named exports throughout; Zod schemas; Vitest tests; no secrets committed | ☐ |
 
 **Self-check total:** ___ / 100
@@ -63,25 +63,25 @@ The pitch must cover all four blocks:
 * README jury note: swipe / «тиндер» for travel.
 * Tutu MCP is the travel data source.
 
-**Files:** `README.md`, `apps/web/src/lib/mcp/*`
+**Files:** `README.md`, `apps/app/src/*`, `server/*`, `shared/*`
 
 ### Depth (15)
 
 * **Hybrid flow:** Idea Deck → Package Deck → Match detail.
-* **Preference engine:** `apps/web/src/lib/prefs/` + `PrefMeter`.
-* **Package builder:** `apps/web/src/lib/packages/buildPackages.ts`, `rankPackages.ts`.
+* **Preference engine:** `apps/app/src/` preference state + visible preference meter.
+* **Package builder:** `apps/app/src/` package orchestration and ranking.
 
 ### UX/UI (20)
 
-* Brand tokens in `apps/web/src/app/globals.css` — see [brand-tokens.md](../plans/tinder/brand-tokens.md).
+* Brand tokens in the app stylesheet — see [product-travel-tinder.md](../plans/product-travel-tinder.md).
 * Swipe without drag (`DeckActions` buttons).
-* Visual QA: [pw-checklist.md](../plans/tinder/pw-checklist.md).
+* Visual QA: [travel-tinder-exec-qa.md](../plans/travel-tinder-exec-qa.md).
 
 ### Documentation (10) — AI-checked
 
 | Doc | Purpose |
 | --- | ------- |
-| `docs/plans/tinder/` | Product, architecture, brand, NeuralDeep, MCP playbooks |
+| `docs/plans/product-travel-tinder.md` and `docs/plans/travel-tinder-exec-*.md` | Product direction, execution order, and QA evidence |
 | `docs/tutu-mcp/tutu-mcp.md` | Live tool reference |
 | `docs/agents/` | Agent instructions |
 | `AGENTS.md` | Commands and entry point |
@@ -98,23 +98,23 @@ The pitch must cover all four blocks:
 
 | Mechanism | Location |
 | --------- | -------- |
-| LLM rule fallback | `apps/web/src/lib/llm/fallbackIntent.ts` |
-| Health endpoint | `apps/web/src/app/api/health/route.ts` |
-| MCP smoke | `pnpm --dir apps/web mcp-smoke` |
-| Package smoke | `pnpm --dir apps/web packages-smoke` |
-| Error UI | `apps/web/src/lib/api/error.ts` |
-| Playwright gates | [pw-checklist.md](../plans/tinder/pw-checklist.md) |
+| LLM rule fallback | `server/llm/` |
+| Health endpoint | `apps/app/api/health.ts` |
+| MCP smoke | `npm run --prefix apps/app mcp-smoke` |
+| Package smoke | `npm run --prefix apps/app packages-smoke` |
+| Error UI | `apps/app/src/` |
+| Playwright gates | [travel-tinder-exec-qa.md](../plans/travel-tinder-exec-qa.md) |
 
 ### Architecture (10) — AI-checked
 
-* Single deployable unit: `apps/web` (Vercel root).
+* Single deployable unit: `apps/app` (Vercel root).
 * Server/client split — see [architecture.md](architecture.md).
-* No server-side session memory; Zustand + localStorage.
+* No server-side session memory; browser state persists the minimal flow state in localStorage.
 
 ### Code (10) — AI-checked
 
-* Named exports throughout `apps/web/src`.
-* Zod: `apps/web/src/lib/llm/schemas.ts`, MCP types.
+* Named exports throughout `apps/app/src`, `server/`, and `shared/`.
+* Zod: `shared/` contracts and server-side MCP/LLM boundaries.
 * Tests: `prefs.test.ts`, `rankPackages.test.ts`, `dates.test.ts`.
 * Secrets: `.env.local` only; `.env.example` template.
 
@@ -134,7 +134,7 @@ Deadline: **21:20 MSK, 19 Aug 2026** (freeze at 21:00).
 
 | Gate | Requirement |
 | ---- | ----------- |
-| PW-5 | Local full happy-path — [pw-checklist.md](../plans/tinder/pw-checklist.md) |
+| PW-5 | Local full happy-path — [travel-tinder-exec-qa.md](../plans/travel-tinder-exec-qa.md) |
 | PW-6 | Deployed URL repeat (ideal) |
 | Smoke | `mcp-smoke` + `packages-smoke` pass |
 | Pitch | Dry-run ≤ 10 min |

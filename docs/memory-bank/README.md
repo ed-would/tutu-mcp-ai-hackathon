@@ -13,5 +13,5 @@
 ## Triage rule
 
 * Need it to keep work moving → `memory-bank`.
-* Need it to explain why/how we decided → `docs/plans/tinder/`.
+* Need it to explain why/how we decided → `docs/plans/product-travel-tinder.md` or the relevant `travel-tinder-exec-*.md` plan.
 * No longer needed → `docs/plans/archive/`.

@@ -44,9 +44,10 @@ Add prefix-named plans here as the solution takes shape (`product-`, `architectu
 
 | File | Topic |
 | ---- | ----- |
-| [product-travel-Tinder-mvp.md](product-travel-Tinder-mvp.md) | Tutu Travel Tinder Tech — MVP implementation plan |
-| [tinder/ui-wow-redesign.md](tinder/ui-wow-redesign.md) | Hybrid Poster Stack UI redesign (completed; visuals superseded by Route & Stamp) |
-| [tinder/ui-route-stamp.md](tinder/ui-route-stamp.md) | Route & Stamp travel visual identity v2 (pending) |
+| [product-travel-tinder.md](product-travel-tinder.md) | Tutu Travel Tinder product and MVP direction |
+| [travel-tinder-exec-roadmap.md](travel-tinder-exec-roadmap.md) | Ordered execution roadmap |
+| [travel-tinder-exec-qa.md](travel-tinder-exec-qa.md) | QA and release verification steps |
+| [travel-tinder-exec-qa-matrix.md](travel-tinder-exec-qa-matrix.md) | QA evidence matrix |
 
 ---
 

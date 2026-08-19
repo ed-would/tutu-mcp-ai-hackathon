@@ -23,8 +23,8 @@ Live map of active memory files for the Travel Tinder hackathon project.
 
 ## Key external refs
 
-* Product plan: `docs/plans/tinder/`
-* Judging checklist: `docs/plans/tinder/judging-checklist.md`
-* PW QA gates: `docs/plans/tinder/pw-checklist.md`
+* Product plan: `docs/plans/product-travel-tinder.md`
+* Execution roadmap: `docs/plans/travel-tinder-exec-roadmap.md`
+* QA gates and evidence: `docs/plans/travel-tinder-exec-qa.md`, `docs/plans/travel-tinder-exec-qa-matrix.md`
 * MCP reference: `docs/tutu-mcp/tutu-mcp.md`
-* Architecture: `docs/plans/tinder/architecture.md`
+* Architecture: `docs/agents/architecture.md`
