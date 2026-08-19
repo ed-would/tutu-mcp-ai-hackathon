@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "id": "repo-explorer",
+  "title": "Repository map and ownership discovery",
+  "role": "repository-explorer",
+  "purpose": "Map modules, boundaries, entry points, dependencies, and execution flow.",
+  "defaults": {
+    "max_files": 500,
+    "max_file_bytes": 250000,
+    "max_context_bytes": 1500000,
+    "max_git_diff_bytes": 300000,
+    "max_output_tokens": 16000,
+    "timeout_ms": 600000
+  },
+  "constraints": [
+    "Prioritize entry points, module boundaries, data flow, and ownership.",
+    "Do not infer runtime behavior that is not supported by supplied files.",
+    "Keep the map compact enough for a parent agent to consume.",
+    "Call out missing files needed to close important flow gaps."
+  ]
+}

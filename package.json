@@ -1,0 +1,25 @@
+{
+  "name": "tutu-mcp-ai-hackathon",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "deepseek": "tsx tools/deepseek/worker.ts",
+    "deepseek:task": "node tools/deepseek/task.mjs",
+    "deepseek:doctor": "node tools/deepseek/doctor.mjs",
+    "deepseek:typecheck": "tsc --noEmit --pretty false --strict --skipLibCheck --module NodeNext --moduleResolution NodeNext --target ES2022 --types node tools/deepseek/worker.ts",
+    "deepseek:smoke": "tsx tools/deepseek/worker.ts --task .deepseek/tasks/worker-smoke-001.json --out .deepseek/runs/worker-smoke-001.json --force"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "fast-glob": "^3.3.3",
+    "openai": "^7.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2"
+  }
+}

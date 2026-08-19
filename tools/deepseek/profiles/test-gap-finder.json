@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "id": "test-gap-finder",
+  "title": "Test coverage gap analysis",
+  "role": "test-gap-finder",
+  "purpose": "Identify missing tests for changed behavior and important failure modes.",
+  "defaults": {
+    "max_files": 350,
+    "max_file_bytes": 250000,
+    "max_context_bytes": 1000000,
+    "max_git_diff_bytes": 500000,
+    "max_output_tokens": 16384,
+    "timeout_ms": 600000
+  },
+  "constraints": [
+    "Tie every proposed test to a changed behavior or demonstrated risk.",
+    "Distinguish missing coverage from merely different test style.",
+    "Prioritize regression, authorization, isolation, and failure-path tests.",
+    "Do not claim tests were executed."
+  ]
+}

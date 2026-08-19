@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "id": "independent-critic",
+  "title": "Independent evidence-based critique",
+  "role": "independent-critic",
+  "purpose": "Challenge a proposed conclusion, implementation, or review without inheriting its assumptions.",
+  "defaults": {
+    "max_files": 300,
+    "max_file_bytes": 250000,
+    "max_context_bytes": 1000000,
+    "max_git_diff_bytes": 400000,
+    "max_output_tokens": 16384,
+    "timeout_ms": 600000
+  },
+  "constraints": [
+    "Act as an independent second opinion.",
+    "Look for false assumptions, omitted cases, and unsupported certainty.",
+    "Do not manufacture disagreement when the evidence supports the proposal.",
+    "Explain material agreement as clearly as material disagreement."
+  ]
+}

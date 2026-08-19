@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "id": "security-review",
+  "title": "Bounded security review",
+  "role": "security-reviewer",
+  "purpose": "Review security-sensitive changes and trust boundaries from supplied evidence.",
+  "defaults": {
+    "max_files": 350,
+    "max_file_bytes": 250000,
+    "max_context_bytes": 1200000,
+    "max_git_diff_bytes": 500000,
+    "max_output_tokens": 16384,
+    "timeout_ms": 600000
+  },
+  "constraints": [
+    "Prioritize authentication, authorization, tenant isolation, secret handling, injection, and unsafe defaults.",
+    "Report only evidence-backed vulnerabilities or clearly labeled hypotheses.",
+    "Do not turn incomplete model output into a security finding.",
+    "The parent agent must independently verify every critical or high-severity finding."
+  ]
+}

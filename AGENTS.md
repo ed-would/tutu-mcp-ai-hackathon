@@ -6,24 +6,7 @@ Primary context: [README.md](README.md) (hackathon brief, dates, judging criteri
 
 ## Commands
 
-**Travel Tinder web app (`apps/web`):**
-
-```bash
-cd apps/web
-pnpm install
-pnpm dev          # local dev server
-pnpm build        # production build
-pnpm lint         # ESLint
-pnpm test         # Vitest — prefs, packages, dates
-pnpm mcp-smoke    # MCP tools/list + playbook smoke
-pnpm packages-smoke  # package builder orchestration smoke
-```
-
-Equivalent from repo root:
-
-```bash
-pnpm --dir apps/web dev|build|lint|test|mcp-smoke|packages-smoke
-```
+**App not yet scaffolded.** Commands will be added here once `apps/app` is initialised.
 
 **MCP smoke test** (curl + jq, no app):
 
@@ -60,8 +43,13 @@ curl -s https://mcp.tutu.ru/mcp -H 'Content-Type: application/json' \
 | Logging, errors, JSON parsing, security | [docs/agents/logging-validation-and-security.md](docs/agents/logging-validation-and-security.md) |
 | Layout of app code, docs, MCP reference | [docs/agents/architecture.md](docs/agents/architecture.md)                                       |
 | Tutu MCP endpoint, tools, playbooks     | [docs/agents/mcp-integration.md](docs/agents/mcp-integration.md)                                 |
-| Travel Tinder MVP plan                  | [docs/plans/tinder/](docs/plans/tinder/)                                                         |
+| Travel Tinder MVP plan                  | [docs/agents/architecture.md](docs/agents/architecture.md) (scaffolding pending)                 |
 | Judging criteria and scoring            | [docs/agents/judging-criteria.md](docs/agents/judging-criteria.md)                               |
 
 
 Short index: [docs/agents/README.md](docs/agents/README.md).
+
+
+
+- **External DeepSeek delegation:** for bounded read-only exploration, research, review, validation, security analysis, or independent critique, load the matching `deepseek-`* repository skill under `.agents/skills/`; keep repository writes, conflict resolution, and final approval with the parent agent.
+

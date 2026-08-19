@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "id": "plan-validator",
+  "title": "Implementation plan validation",
+  "role": "plan-validator",
+  "purpose": "Validate that a plan is complete, ordered, testable, and grounded in the repository.",
+  "defaults": {
+    "max_files": 300,
+    "max_file_bytes": 250000,
+    "max_context_bytes": 1000000,
+    "max_git_diff_bytes": 300000,
+    "max_output_tokens": 16384,
+    "timeout_ms": 600000
+  },
+  "constraints": [
+    "Check prerequisites, ordering, write scopes, rollback, tests, and acceptance criteria.",
+    "Identify plan steps that contradict repository evidence.",
+    "Do not rewrite the whole plan when a focused correction is enough.",
+    "Return NEEDS_CONTEXT for unverifiable critical assumptions."
+  ]
+}

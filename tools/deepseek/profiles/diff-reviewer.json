@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "id": "diff-reviewer",
+  "title": "Correctness and regression review",
+  "role": "diff-reviewer",
+  "purpose": "Review a bounded change for correctness, regressions, and acceptance gaps.",
+  "defaults": {
+    "max_files": 300,
+    "max_file_bytes": 250000,
+    "max_context_bytes": 1000000,
+    "max_git_diff_bytes": 500000,
+    "max_output_tokens": 16384,
+    "timeout_ms": 600000
+  },
+  "constraints": [
+    "Review the supplied diff and supporting files, not the whole product in the abstract.",
+    "Report only actionable evidence-backed findings.",
+    "Ignore style-only observations unless they create a real defect.",
+    "Prioritize critical, high, and user-visible regressions."
+  ]
+}

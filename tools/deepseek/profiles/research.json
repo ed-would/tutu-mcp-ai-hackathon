@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "id": "research",
+  "title": "Bounded repository research",
+  "role": "repository-researcher",
+  "purpose": "Answer a concrete technical question from supplied repository evidence.",
+  "defaults": {
+    "max_files": 300,
+    "max_file_bytes": 250000,
+    "max_context_bytes": 1000000,
+    "max_git_diff_bytes": 300000,
+    "max_output_tokens": 16000,
+    "timeout_ms": 600000
+  },
+  "constraints": [
+    "Answer only the stated research question.",
+    "Separate verified facts from hypotheses.",
+    "Return NEEDS_CONTEXT when essential evidence is absent.",
+    "Do not recommend repository changes unless the evidence supports them."
+  ]
+}

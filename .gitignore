@@ -35,3 +35,12 @@ npm-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 .tmp-research/
+
+# deepseek-worker:start
+# Local credentials and generated DeepSeek worker state
+.env.local
+.deepseek/tasks/*.json
+.deepseek/runs/
+.deepseek/backups/
+.deepseek/installation.json
+# deepseek-worker:end

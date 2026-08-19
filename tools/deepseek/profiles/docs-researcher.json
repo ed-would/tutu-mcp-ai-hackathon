@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "id": "docs-researcher",
+  "title": "Documentation and implementation consistency audit",
+  "role": "documentation-researcher",
+  "purpose": "Find drift between documentation, configuration, public contracts, and code.",
+  "defaults": {
+    "max_files": 350,
+    "max_file_bytes": 250000,
+    "max_context_bytes": 1000000,
+    "max_git_diff_bytes": 300000,
+    "max_output_tokens": 16384,
+    "timeout_ms": 600000
+  },
+  "constraints": [
+    "Compare documentation claims with supplied implementation and configuration.",
+    "Report exact contradictory paths and claims.",
+    "Do not treat stylistic preferences as defects.",
+    "Prioritize user-visible and operationally dangerous drift."
+  ]
+}
