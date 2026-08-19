@@ -53,10 +53,10 @@ export async function runPackagesSmoke(): Promise<void> {
     if (response.sources.length === 0) {
       throw new Error("live package response has no source evidence");
     }
-    const expectedTools = new Set(["search_multitransport", "search_hotels"]);
+    const expectedTools = new Set(["search_multitransport", "search_avia", "search_hotels", "search_bus"]);
     if (
       response.sources.some((source) => !expectedTools.has(source.tool)) ||
-      !response.sources.some((source) => source.tool === "search_multitransport") ||
+      !response.sources.some((source) => source.tool === "search_avia") ||
       !response.sources.some((source) => source.tool === "search_hotels")
     ) {
       throw new Error("live package response contains an unknown source tool");
@@ -68,13 +68,11 @@ export async function runPackagesSmoke(): Promise<void> {
       }
       if (packageResult.price.confidence === "exact_round_trip") {
         const outbound = packageResult.transport.outbound;
-        const returning = packageResult.transport.return;
-        if (
-          typeof outbound !== "object" || outbound === null ||
-          typeof returning !== "object" || returning === null ||
-          (outbound as Record<string, unknown>).is_round_trip !== true ||
-          (returning as Record<string, unknown>).is_round_trip !== true
-        ) {
+        const checkoutRef = packageResult.transport.checkoutRef;
+        const outboundRecord = typeof outbound === "object" && outbound !== null ? outbound as Record<string, unknown> : undefined;
+        const checkoutRecord = typeof checkoutRef === "object" && checkoutRef !== null ? checkoutRef as Record<string, unknown> : undefined;
+        const exact = checkoutRecord?.is_round_trip === true || outboundRecord?.is_round_trip === true;
+        if (!exact) {
           throw new Error("fabricated exact_round_trip from one-way transport legs");
         }
       }

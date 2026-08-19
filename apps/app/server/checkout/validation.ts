@@ -15,10 +15,12 @@ export const CheckoutRequestSchema = z
     // Keep the MCP spelling as a compatibility alias for callers forwarding
     // a package's raw checkout_ref field.
     checkout_ref: CheckoutRefSchema.optional(),
+    refs: z.array(CheckoutRefSchema).min(1).max(8).optional(),
   })
   .strict()
   .superRefine((value, context) => {
-    if (!value.checkoutRef && !value.checkout_ref) {
+    const hasRefs = (value.refs?.length ?? 0) > 0;
+    if (!value.checkoutRef && !value.checkout_ref && !hasRefs) {
       context.addIssue({
         code: "custom",
         path: ["checkoutRef"],
@@ -38,12 +40,31 @@ export const CheckoutRequestSchema = z
 export type CheckoutRef = z.infer<typeof CheckoutRefSchema>;
 export type CheckoutRequest = z.infer<typeof CheckoutRequestSchema>;
 
+export function collectCheckoutRefs(request: CheckoutRequest): CheckoutRef[] {
+  if (request.refs && request.refs.length > 0) return request.refs;
+  const single = request.checkoutRef ?? request.checkout_ref;
+  return single ? [single] : [];
+}
+
+export type CheckoutStepProduct = "transport_outbound" | "transport_return" | "hotel";
+
+export type CheckoutStep = {
+  order: number;
+  label: string;
+  url: string;
+  product: CheckoutStepProduct;
+  kind?: string;
+  fallbackUrl?: string;
+  note?: string;
+};
+
 export type CheckoutResponse = {
   url: string;
   kind: string;
   fallbackUrl?: string;
   note?: string;
   requestId: string;
+  steps: CheckoutStep[];
 };
 
 export type CheckoutErrorBody = {
@@ -200,7 +221,7 @@ function optionalUrl(payload: RecordValue, keys: string[], field: string): strin
 }
 
 /** Normalize the MCP payload while preserving all URL strings byte-for-byte. */
-export function normalizeCheckoutPayload(result: unknown): Omit<CheckoutResponse, "requestId"> {
+export function normalizeCheckoutPayload(result: unknown): Omit<CheckoutResponse, "requestId" | "steps"> {
   const payload = extractCheckoutPayload(result);
   const checkoutUrl = optionalUrl(payload, ["checkout_url", "checkoutUrl", "url"], "checkout");
   const searchUrl = optionalUrl(

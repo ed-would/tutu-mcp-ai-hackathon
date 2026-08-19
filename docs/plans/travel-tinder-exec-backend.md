@@ -7,10 +7,48 @@ scope: docs/plans
 
 # Travel Tinder — План 2.2 (backend, MCP orchestration, pricing contracts)
 
+## Легенда статуса (аудит 2026-08-19, повторная сверка с кодом)
+
+| Индикатор | Значение |
+| --------- | -------- |
+| 🟢 | Полностью выполнено — соответствует плану в рабочем коде |
+| 🟡 | Частично — есть зачаток, но не по спецификации или без полировки |
+| 🔴 | Не выполнено — отсутствует или только упомянуто в плане |
+
+**Сводка:** 🟢 ~52 · 🟡 ~10 · 🔴 ~2 (из ~64 проверяемых пунктов)
+
+**Evidence (локально, 2026-08-19):** `npm run typecheck` ✅ · `npm run test` ✅ (47/47) · `npm run mcp-smoke` ✅ · `npm run packages-smoke` ✅ (live: 2 packages, `search_avia` + multitransport + hotels).
+
+**Backend закрыт для демо.** Критичные P0/P1 пункты реализованы; оставшееся — осознанные упрощения или зона фронта.
+
+**Что уже держит вертикальный срез:** все 4 route; live `search_avia` round-trip + честный `exact_round_trip`; family `search_avia` + `search_bus` × 2 + `children_ages`; `optimal` / `faster_or_comfortable`; `CheckoutStep[]` при `{ refs }` (и fallback `steps` даже для одного ref); health fingerprint + duration budgets; seed-stable rank + `preferenceSummary`; MCP retry; shared/runtime контракты согласованы.
+
+**Что осталось (backend, некритично):**
+
+| Пункт | Статус | Комментарий |
+| ----- | ------ | ----------- |
+| Batch-ranking 3 liked directions на сервере | 🟡 | Клиент шлёт до 2 likes двумя запросами — достаточно для демо |
+| Like/pass накопление весов | 🟡 | Считается на клиенте; сервер только ранжирует пришедший `preferences` |
+| Health fingerprint | 🟡 | Config-hash ожидаемых tools, не live `tools/list` на каждый `/health` (live — в `mcp-smoke`) |
+| MCP retry | 🟡 | 1 повтор, 200 ms backoff — не полноценная exponential policy |
+| Smoke в CI | 🟡 | Скрипты есть, автоматический gate в pipeline не зафиксирован |
+| `search_rail` как отдельный tool-call | 🟡 | Не вызывается напрямую; rail идёт через `search_multitransport` |
+
+**Что осталось (фронт, вне scope backend-плана):**
+
+| Пункт | Статус | Где |
+| ----- | ------ | --- |
+| Multi-step checkout CTA | 🔴 | `DiscoverPage` шлёт один `checkoutRef`, не `refs[]` |
+| `preferenceSummary` в UI | 🔴 | API отдаёт, клиент не рисует |
+| Family flow в UI | 🔴 | `travel.ts` блокирует `childrenAges` до вызова API |
+| Bottom sheet clarify | 🔴 | Отдельный экран, не sheet |
+
+---
+
 ## 0) Пререквизиты
 
-1. Infra scaffold завершён и `/api/health` отвечает.
-2. Протоколы и tool names подтверждены против `docs/tutu-mcp/tutu-mcp.md` перед стартом coding.
+1. 🟢 Infra scaffold завершён и `/api/health` отвечает (`apps/app/api/health.ts`, `npm run build` проходит).
+2. 🟡 Протоколы и tool names — `mcp-smoke` валидирует live `tools/list` (16 tools, `search_avia=true`); `/api/health` отдаёт **config-only** fingerprint ожидаемых tools, не live hash.
 
 ---
 
@@ -47,18 +85,18 @@ type InterpretResponse =
 
 `TravelIntent` (ядро входа в `/api/packages`) включает:
 
-- город отправления и дата туда/обратно,
-- `adults` и точные возраста детей,
-- общий бюджет,
-- темп поездки, интересы и `desiredVibe`,
-- допустимые виды транспорта,
-- `hotelPreferences` (завтрак, отмена, число кроватей, `choose_self` / explicit hotel choice).
+- 🟢 город отправления и дата туда/обратно,
+- 🟢 `adults` и точные возраста детей,
+- 🟢 общий бюджет,
+- 🟢 темп поездки, интересы и `desiredVibe`,
+- 🟢 допустимые виды транспорта,
+- 🟢 `hotelPreferences` (завтрак, отмена, число кроватей, `choose_self` / explicit hotel choice).
 
 **Нормы:**
 
-1. Если критичные поля не заполнены, сразу задаём до 3 уточняющих вопросов через один `bottom sheet`.
-2. Никаких скрытых дефолтов (`"Москва"`, `"ближайшие выходные"`) до завершения clarification.
-3. При валидационной ошибке всегда единый error contract (см. §2).
+1. 🟢 Если критичные поля не заполнены, сразу задаём до 3 уточняющих вопросов через один `bottom sheet` (backend: `needs_clarification`, ≤ 3; UI sheet — отдельная задача фронта).
+2. 🟡 Никаких скрытых дефолтов (`"Москва"`, `"ближайшие выходные"`) до завершения clarification — rule fallback извлекает из текста, не подставляет молча, но LLM-путь зависит от промпта.
+3. 🟢 При валидационной ошибке всегда единый error contract (см. §2).
 
 ### 1.2) `POST /api/packages`
 
@@ -86,20 +124,20 @@ type PackagesResponse = {
 **Оркестрационный минимум:**
 
 1. Для взрослых:
-   - `search_multitransport` туда и обратно (мультимодальное сравнение),
-   - `search_avia` с `return_date` (real round-trip),
-   - `search_hotels` с `preferences`-gate.
+   - 🟢 `search_multitransport` туда и обратно (мультимодальное сравнение),
+   - 🟢 `search_avia` с `return_date` (real round-trip),
+   - 🟢 `search_hotels` с `preferences`-gate (whitelist MCP keys + aliases).
 2. Для семейного сценария:
-   - `search_avia` с `return_date` (round-trip),
-   - `search_bus` туда и обратно,
-   - `search_hotels` с `children_ages`.
-3. Поезд и семейка: rail из pricing исключается, если MCP для rail не принимает возраст детей.
-4. Все независимые MCP-вызовы запускаются через `Promise.allSettled`.
-5. Live prefetch — только после лайка; непрогретые идеи MCP не вызывают.
+   - 🟢 `search_avia` с `return_date` (round-trip),
+   - 🟢 `search_bus` туда и обратно,
+   - 🟢 `search_hotels` с `children_ages`.
+3. 🟢 Поезд и семейка: rail из pricing исключается — family path не вызывает `search_rail` / `search_multitransport`.
+4. 🟢 Все независимые MCP-вызовы запускаются через `Promise.allSettled`.
+5. 🟢 Live prefetch — только после лайка; непрогретые идеи MCP не вызывают (контракт API; enforcement на клиенте).
 6. Параллельная генерация пакетов:
-   - максимум 2 liked ideas за цикл,
-   - максимум 3 liked directions в ранжировании,
-   - для одной идеи максимум 2 пакета: `optimal` и `faster_or_comfortable`.
+   - 🟡 максимум 2 liked ideas за цикл — backend обслуживает одну idea за запрос; клиент уже делает два параллельных вызова,
+   - 🟡 максимум 3 liked directions в ранжировании — клиент берёт 2 likes, сервер ранжирует пакеты внутри idea,
+   - 🟢 для одной идеи максимум 2 пакета: `optimal` и `faster_or_comfortable`.
 
 ### 1.3) Цена и честность (`TripPackage.price`)
 
@@ -118,14 +156,14 @@ type PackagePrice =
     };
 ```
 
-1. Для авиа round-trip + hotel используется точный total текущих офферов.
-2. Для автобус/поезд (out + return) + hotel — ориентир с `~`, отдельный breakdown и две отдельные транспортные покупки.
-3. Цена отеля уже включает весь stay и не умножается повторно на ночи.
-4. Карточка пакета всегда показывает:
-   - `timestamp`,
-   - `source: "Tutu MCP"`,
-   - `confidence` (точность).
-5. Частичные ответы допустимы (например, транспорт без отеля): UI показывает отсутствующий сегмент как отсутствующий, не маскирует и не подставляет фиктивную часть.
+1. 🟢 Для авиа round-trip + hotel — `exact_round_trip` только при `checkout_ref.is_round_trip=true` + `return_departure_at` и без `is_multi_pnr` (`server/packages/orchestrator.ts`).
+2. 🟢 Для автобус/поезд (out + return) + hotel — ориентир с `~`, breakdown и две отдельные транспортные покупки (`estimated_split_trip`).
+3. 🟢 Цена отеля уже включает весь stay и не умножается повторно на ночи (покрыто тестами).
+4. 🟢 Карточка пакета всегда показывает:
+   - 🟢 `timestamp` (и совместимый `updatedAt`),
+   - 🟢 `source: "Tutu MCP"`,
+   - 🟢 `confidence` (точность).
+5. 🟢 Частичные ответы допустимы (например, транспорт без отеля): UI показывает отсутствующий сегмент как отсутствующий, не маскирует и не подставляет фиктивную часть.
 
 ### 1.4) `POST /api/checkout`
 
@@ -142,121 +180,148 @@ type CheckoutStep = {
 };
 ```
 
-1. Авиа:
+1. 🟢 Авиа:
    - один checkout-step для `transport_outbound` с `is_round_trip = true`,
-   - `hotel` (2 шага: round-trip transport + hotel).
-2. Поезд/автобус:
+   - `hotel` (2 шага: round-trip transport + hotel) — через `{ refs: [...] }`; текущий UI по-прежнему шлёт один `checkoutRef`.
+2. 🟢 Поезд/автобус:
    - `transport_outbound`,
    - `transport_return`,
-   - `hotel` (3 шага).
-3. Кнопка в UI — строго «Перейти к бронированию».
-4. Для avia в шагах сохраняются `passengerCounts`, `is_round_trip`, `return_departure_at`.
-5. Приложение не обещает оплату/завершённое бронирование, только редирект по внешним ссылкам.
-6. URL проверяются по allowlist и передаются без ручной сборки.
+   - `hotel` (3 шага) — тот же `{ refs }` контракт.
+3. 🟡 Кнопка в UI — строго «Перейти к бронированию» (копирайт на фронте).
+4. 🟢 Для avia в шагах сохраняются `passengerCounts`, `is_round_trip`, `return_departure_at` — opaque ref уходит в MCP verbatim.
+5. 🟢 Приложение не обещает оплату/завершённое бронирование, только редирект по внешним ссылкам.
+6. 🟢 URL проверяются по allowlist и передаются без ручной сборки (`isAllowedTutuUrl`, opaque ref verbatim).
 
 ### 1.5) `GET /api/health`
 
 Возвращаем только:
 
-- `app: ok`,
-- `llm: ok | degraded`,
-- `mcp: ok | degraded`,
-- `schema/tool fingerprint`,
-- `durations`,
-- `timestamp`.
+- 🟢 `app: ok`,
+- 🟢 `llm: ok | degraded`,
+- 🟢 `mcp: ok | degraded`,
+- 🟡 `schema/tool fingerprint` — config-hash ожидаемых tools (`server/mcp/tools.ts`); live `tools/list` только в `mcp-smoke`,
+- 🟢 `durations`,
+- 🟢 `timestamp`.
 
-Ни env-переменные, ни сырые ошибки, ни ключи.
+Ни env-переменные, ни сырые ошибки, ни ключи — 🟢 соблюдается.
 
 ### 1.6) Preference engine
 
 Вектор весов учитывает интересы, темп, бюджет, комфорт и транспорт.
 
-1. Like: `+1.0` по тегам идеи.
-2. Pass: `-0.35`.
-3. Веса нормализуются в диапазон `[-1, 1]`.
-4. Ранжирование:
+1. 🟡 Like: `+1.0` по тегам идеи — клиент считает вектор, сервер ранжирует пакеты если веса пришли.
+2. 🟡 Pass: `-0.35` — на клиенте (фактически `-0.45`); сервер клипает веса в `[-1, 1]`.
+3. 🟢 Веса нормализуются в диапазон `[-1, 1]`.
+4. 🟢 Ранжирование:
    - 85% `weighted relevance`,
    - 15% `ε-greedy` exploration.
-5. `sessionSeed` обязателен в профиле для воспроизводимости.
-6. UI показывает человеческий интерпретируемый вывод (например: «вам важны поезда, гастрономия и короткая дорога»), а не сырой вектор.
+5. 🟢 `sessionSeed` обязателен в профиле для воспроизводимости.
+6. 🟡 Человеческий интерпретируемый вывод — backend отдаёт `preferenceSummary`; **фронт пока не рисует** (см. таблицу «фронт» в шапке).
 
 ---
 
 ## 2) Contracts/layers
 
-1. Все API/input/output/internal модели через Zod.
-2. Реализовать shared DTO в `apps/app/shared/contracts`.
-3. Единый error contract:
+1. 🟢 Все API/input/output/internal модели через Zod.
+2. 🟢 Реализовать shared DTO в `apps/app/shared/contracts` — runtime shape совпадает (packages transport/hotel, checkout `{ url, steps }`).
+3. 🟢 Единый error contract:
    ` { code, message, retryable, requestId, stage } `.
-4. Stage для ошибок: `interpret`, `packages`, `checkout`, `mcp-call`, `validation`.
-5. Протестировать parse/normalize на happy и malformed payload.
-6. Не логировать raw user intent, MCP payload и секреты.
+4. 🟢 Stage для ошибок: `interpret`, `packages`, `checkout`, `mcp-call`, `validation`.
+5. 🟢 Протестировать parse/normalize на happy и malformed payload (`tests/contracts.test.ts`, `packages.test.ts`, `checkout.test.ts`).
+6. 🟢 Не логировать raw user intent, MCP payload и секреты.
 
 ---
 
 ## 3) MCP orchestration и LLM fallback
 
-1. Инициализация MCP через `@modelcontextprotocol/client` + streamable transport.
+1. 🟢 Инициализация MCP через `@modelcontextprotocol/client` + streamable transport.
 2. Схема обработки:
-   1) interpret/clarification path;
-   2) idea generation (LLM + validation + rule fallback);
-3) package flow;
-   4) checkout refs только после выбора пакета.
+   1) 🟢 interpret/clarification path;
+   2) 🟢 idea generation (LLM + validation + rule fallback);
+   3) 🟢 package flow — avia round-trip + multi/bus + hotels;
+   4) 🟢 checkout refs только после выбора пакета — `create_checkout_link`, `steps[]` для `{ refs }`.
 3. Тайминги:
-   - LLM 8 сек.
-   - MCP 12 сек на call.
-   - Route cap 20 сек.
-4. Retry только для retry-safe ошибок (429/5xx/network), max attempts и backoff.
-5. Серверная сессия stateless:
+   - 🟢 LLM 8 сек.
+   - 🟢 MCP 12 сек на call.
+   - 🟢 Route cap 20 сек.
+4. 🟡 Retry для retry-safe ошибок (429/5xx/network) — **1 повтор**, 200 ms пауза (`server/mcp/retry.ts`); не exponential backoff с max attempts > 2.
+5. 🟢 Серверная сессия stateless:
    - каждый запрос получает свой MCP-коннект;
    - закрываем transport в finally.
-6. Partial responses — allowed states; ни один upstream-failure не должен падать в hard crash UI.
+6. 🟢 Partial responses — allowed states; ни один upstream-failure не должен падать в hard crash UI.
 
 ---
 
 ## 4) Ценовой контракт (exact vs estimated)
 
-1. `exact_round_trip`: для полноценного round-trip pricing.
-2. `estimated_split_trip`: для двух отдельных legs с `~`.
-3. Для `search_bus`/`search_hotels` соблюдаем partial/complete semantics.
-4. Семейный сценарий: rail-прайс исключается, если MCP contract не поддерживает детей на rail.
-5. `hotel` стоимость **никогда** не умножается повторно на nights.
-6. Каждая карточка цены показывает:
-   - источник `Tutu MCP`,
-   - timestamp обновления,
-   - статус точности.
+1. 🟢 `exact_round_trip`: для полноценного round-trip pricing.
+2. 🟢 `estimated_split_trip`: для двух отдельных legs с `~`.
+3. 🟢 Для `search_bus`/`search_hotels` соблюдаем partial/complete semantics.
+4. 🟢 Семейный сценарий: rail-прайс исключается, если MCP contract не поддерживает детей на rail.
+5. 🟢 `hotel` стоимость **никогда** не умножается повторно на nights.
+6. 🟢 Каждая карточка цены показывает:
+   - 🟢 источник `Tutu MCP`,
+   - 🟢 timestamp обновления (`timestamp` / `updatedAt`),
+   - 🟢 статус точности.
 
 ---
 
 ## 5) Checkout + trust boundary
 
-1. Allowlist только разрешённых hosts.
-2. Идентификаторы поездок/чека только для построения перехода, без хранения PII.
-3. Для avia сохраняем: количество пассажиров, `is_round_trip`, `return_departure_at`.
-4. Никаких in-app оплат.
+1. 🟢 Allowlist только разрешённых hosts.
+2. 🟢 Идентификаторы поездок/чека только для построения перехода, без хранения PII.
+3. 🟢 Для avia сохраняем: количество пассажиров, `is_round_trip`, `return_departure_at` (verbatim в checkout_ref).
+4. 🟢 Никаких in-app оплат.
 
 ---
 
-## 6) Acceptance (пока backend block is not green)
+## 6) Acceptance
 
-1. Смоуки:
-   - `npm run --prefix apps/app mcp-smoke`
-   - `npm run --prefix apps/app packages-smoke`
-2. Unit-инварианты:
-   - <= 3 clarification questions;
-   - family vs adult routing;
-   - exact/estimated distinction;
-   - отсутствие изобретения полей/URLs;
-   - malformed MCP поля не заполняются догадками;
-   - hotel price not multiplied by nights;
-   - deterministic behavior for seed;
-   - timeout/fallback path.
-3. Любой divergence от MCP tool names без повторной валидации `docs/tutu-mcp/tutu-mcp-tools.json` = блокер.
+1. Смоуки (проверено 2026-08-19):
+   - 🟢 `npm run --prefix apps/app mcp-smoke` — live `tools/list`, fingerprint `3b7655785215`
+   - 🟢 `npm run --prefix apps/app packages-smoke` — live packages, `search_avia` + multitransport + hotels
+2. Unit-инварианты (`npm run test` — 47/47):
+   - 🟢 <= 3 clarification questions;
+   - 🟢 family vs adult routing;
+   - 🟢 exact/estimated distinction;
+   - 🟢 отсутствие изобретения полей/URLs;
+   - 🟢 malformed MCP поля не заполняются догадками;
+   - 🟢 hotel price not multiplied by nights;
+   - 🟢 deterministic behavior for seed;
+   - 🟢 timeout/fallback path;
+   - 🟢 MCP retry (`tests/mcp-retry.test.ts`).
+3. 🟡 Divergence от MCP tool names = блокер — smoke-скрипт есть; **CI gate не зафиксирован**.
 
 ---
 
 ## 7) Готовность и lock
 
-1. После backend plan: контрактные outputs должны быть доступны для Frontend + QA.
-2. Без обновления `docs/agents/verification.md`/`docs/agents/architecture.md` по измененным trust-boundaries backend не закрывается.
-3. Все изменения фиксируем в `docs/plans/travel-tinder-exec-backend.md` и соответствующих evidence.
+1. 🟢 После backend plan: контрактные outputs доступны для Frontend + QA.
+2. 🟢 Без обновления `docs/agents/verification.md`/`docs/agents/architecture.md` по измененным trust-boundaries backend не закрывается.
+3. 🟢 Все изменения фиксируем в `docs/plans/travel-tinder-exec-backend.md` и соответствующих evidence.
+
+---
+
+## 8) Приоритет для жюри
+
+По `docs/agents/judging-criteria.md` — критерии **Theme**, **Depth**, **MCP integration** напрямую смотрят на backend.
+
+| Приоритет | Пункт плана | Статус |
+| --------- | ----------- | ------ |
+| **P0** | `search_avia` + честный `exact_round_trip` | 🟢 |
+| **P0** | Multi-step `CheckoutStep[]` + `create_checkout_link` | 🟢 backend; UI всё ещё один CTA |
+| **P0** | Свести `shared/contracts` и runtime API | 🟢 |
+| **P1** | Family flow: `search_avia` + `search_bus` + `children_ages` | 🟢 backend; клиент пока блокирует children |
+| **P1** | Preference engine / server-side rank | 🟢 seed + ε-greedy; клиент не шлёт полный вектор |
+| **P1** | Health fingerprint + durations | 🟡 fingerprint config-only; durations 🟢 |
+| **P2** | `optimal` / `faster_or_comfortable` | 🟢 |
+| **P2** | MCP retry/backoff | 🟡 1 retry / 200 ms |
+| **P2** | Обновить `verification.md` / `architecture.md` | 🟢 |
+
+---
+
+## 9) Итог
+
+**Backend block: зелёный для хакатона.** Жюри-критичные MCP-вызовы (`search_avia`, `search_multitransport`, `search_hotels`, `create_checkout_link`) работают live; exact vs estimated честный; checkout multi-step готов на API.
+
+**Следующий рычаг для продукта — фронт** (не backend): снять блок `childrenAges` в `travel.ts`, слать `refs[]` в checkout, показать `preferenceSummary` и multi-step CTA. Без этого жюри увидит сильный backend, но слабее end-to-end story в UI.

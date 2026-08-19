@@ -3,22 +3,28 @@ import {
   CheckoutMcpError,
   CheckoutPayloadError,
   CheckoutRequestSchema,
+  collectCheckoutRefs,
   type CheckoutErrorBody,
   type CheckoutRef,
+  type CheckoutStep,
 } from "../server/checkout/validation";
-import { createCheckoutLink } from "../server/checkout/service";
+import { createCheckoutLink, createCheckoutSteps, toCheckoutStep } from "../server/checkout/service";
 import { parseJsonBody } from "../server/http/request";
 
-type CheckoutDependencies = {
-  createCheckoutLink: (checkoutRef: CheckoutRef) => Promise<{
-    url: string;
-    kind: string;
-    fallbackUrl?: string;
-    note?: string;
-  }>;
+type CheckoutLinkResult = {
+  url: string;
+  kind: string;
+  fallbackUrl?: string;
+  note?: string;
+  steps?: CheckoutStep[];
 };
 
-const defaultDependencies: CheckoutDependencies = { createCheckoutLink };
+type CheckoutDependencies = {
+  createCheckoutLink: (checkoutRef: CheckoutRef) => Promise<CheckoutLinkResult>;
+  createCheckoutSteps?: (refs: CheckoutRef[]) => Promise<CheckoutLinkResult>;
+};
+
+const defaultDependencies: CheckoutDependencies = { createCheckoutLink, createCheckoutSteps };
 
 function jsonResponse(body: unknown, status: number, requestId: string): Response {
   return new Response(JSON.stringify(body), {
@@ -44,6 +50,10 @@ function errorResponse(
   return jsonResponse(body, status, requestId);
 }
 
+function linkToStep(ref: CheckoutRef, result: CheckoutLinkResult, index: number, total: number): CheckoutStep {
+  return result.steps?.[index] ?? toCheckoutStep(ref, result, index, total);
+}
+
 /** Vercel-compatible checkout route. */
 export async function checkoutHandler(
   request: Request,
@@ -67,10 +77,8 @@ export async function checkoutHandler(
   const parsed = await parseJsonBody(request, CheckoutRequestSchema, "checkout");
   if (!parsed.ok) return parsed.response;
 
-  const checkoutRef = parsed.value.checkoutRef ?? parsed.value.checkout_ref;
-  // The schema guarantees this, but retaining the guard keeps this route safe
-  // if the schema is ever relaxed or replaced by a shared contract.
-  if (!checkoutRef) {
+  const refs = collectCheckoutRefs(parsed.value);
+  if (refs.length === 0) {
     return errorResponse(
       requestId,
       400,
@@ -82,8 +90,23 @@ export async function checkoutHandler(
   }
 
   try {
-    const result = await dependencies.createCheckoutLink(checkoutRef);
-    return jsonResponse({ ...result, requestId }, 200, requestId);
+    if (refs.length > 1 && dependencies.createCheckoutSteps) {
+      const result = await dependencies.createCheckoutSteps(refs);
+      const steps = result.steps ?? refs.map((ref, index) => linkToStep(ref, result, index, refs.length));
+      return jsonResponse({ ...result, steps, requestId }, 200, requestId);
+    }
+
+    const steps: CheckoutStep[] = [];
+    let first: CheckoutLinkResult | undefined;
+    for (const [index, checkoutRef] of refs.entries()) {
+      const result = await dependencies.createCheckoutLink(checkoutRef);
+      first ??= result;
+      steps.push(linkToStep(checkoutRef, result, index, refs.length));
+    }
+    if (!first || steps.length === 0) {
+      return errorResponse(requestId, 502, "MCP_CHECKOUT_FAILED", "Tutu checkout is unavailable.", true, "mcp-call");
+    }
+    return jsonResponse({ ...first, steps, requestId }, 200, requestId);
   } catch (error: unknown) {
     if (error instanceof CheckoutPayloadError) {
       return errorResponse(

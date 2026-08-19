@@ -16,6 +16,9 @@ describe("GET /api/health", () => {
     expect(["ok", "degraded"]).toContain(body.llm);
     expect(["ok", "degraded"]).toContain(body.mcp);
     expect(typeof body.timestamp).toBe("string");
+    expect(body.fingerprint.tools).toEqual(expect.arrayContaining(["search_avia", "search_bus", "create_checkout_link"]));
+    expect(typeof body.fingerprint.hash).toBe("string");
+    expect(body.durations).toMatchObject({ llmMs: 8_000, mcpCallMs: 12_000, routeMs: 20_000 });
     expect(JSON.stringify(body)).not.toContain("NEURALDEEP_API_KEY");
   });
 

@@ -75,4 +75,4 @@ Compare tool names with `docs/tutu-mcp/tutu-mcp-tools.json` when updating integr
 
 ## Deploy verification
 
-After the deployment step in [travel-tinder-exec-roadmap.md](../plans/travel-tinder-exec-roadmap.md): `npm run --prefix apps/app build` on CI/Vercel; repeat the QA flow on the production URL; `/api/health` shows MCP + LLM status.
+After the deployment step in [travel-tinder-exec-roadmap.md](../plans/travel-tinder-exec-roadmap.md): `npm run --prefix apps/app build` on CI/Vercel; repeat the QA flow on the production URL; `/api/health` shows MCP + LLM status, the expected tool fingerprint, and timeout budgets (config-only — it does not call Tutu).

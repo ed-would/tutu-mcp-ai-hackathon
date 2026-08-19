@@ -3,6 +3,7 @@ import { z } from "zod";
 export const SourceWarningSchema = z.object({
   code: z.string().min(1).max(80),
   message: z.string().min(1).max(300),
+  source: z.enum(["transport", "hotel", "validation", "mcp"]).optional(),
   stage: z.string().min(1).max(80).optional(),
   retryable: z.boolean().default(false),
 });
@@ -10,10 +11,12 @@ export const SourceWarningSchema = z.object({
 export type SourceWarning = z.infer<typeof SourceWarningSchema>;
 
 export const SourceEvidenceSchema = z.object({
-  source: z.literal("Tutu MCP"),
+  source: z.literal("Tutu MCP").optional(),
   tool: z.string().min(1).max(120),
-  fetchedAt: z.string().datetime(),
-  status: z.enum(["complete", "partial", "failed"]),
+  fetchedAt: z.string().datetime().optional(),
+  receivedAt: z.string().datetime().optional(),
+  status: z.enum(["ok", "partial", "unavailable", "complete", "failed"]),
+  variants: z.number().int().nonnegative().optional(),
 });
 
 export type SourceEvidence = z.infer<typeof SourceEvidenceSchema>;

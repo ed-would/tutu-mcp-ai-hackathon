@@ -17,7 +17,20 @@ High-level layout for the Tutu MCP hackathon project. Coding rules live in [type
 
 ## Application (`apps/app`)
 
-The initial scaffold is in place: Vite + React + TypeScript in `apps/app/`, with Vercel-compatible functions under `apps/app/api/` and shared server contracts in `server/` and `shared/`.
+Vite + React + TypeScript in `apps/app/`, with Vercel-compatible functions under `apps/app/api/` and shared server contracts in `server/` and `shared/`.
+
+### Backend routes
+
+| Route | Role |
+| ----- | ---- |
+| `POST /api/interpret` | LLM intent + 8 ideas, rule fallback, clarification ≤ 3 |
+| `POST /api/packages` | Live Tutu MCP packages. Adults: `search_avia` (round-trip) + `search_multitransport` × 2 + `search_hotels`. Family: `search_avia` + `search_bus` × 2 + `search_hotels` with `children_ages`. Rail is skipped for family pricing. |
+| `POST /api/checkout` | `create_checkout_link` for opaque refs. Single `{ checkoutRef }` still returns `{ url, kind }` for the current UI; `{ refs }` returns ordered `steps[]`. URLs pass a tutu.ru HTTPS allowlist. |
+| `GET /api/health` | Config-only readiness: `app` / `llm` / `mcp`, static tool fingerprint, timeout budgets. No live upstream probe and no secrets. |
+
+MCP client is per-request and closed in `finally`. Independent tool calls use `Promise.allSettled` with a 12 s call timeout and 20 s route cap. Package prices are either `exact_round_trip` (avia round-trip offer + hotel stay total) or `estimated_split_trip` (two one-way legs). Hotel amounts are stay totals and are never multiplied by nights.
+
+Trust boundary: checkout identifiers are opaque handles used only to mint Tutu URLs. The app does not take payment or store PII.
 
 ## MCP reference (`docs/tutu-mcp/`)
 

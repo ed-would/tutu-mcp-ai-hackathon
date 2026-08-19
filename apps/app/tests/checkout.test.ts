@@ -82,6 +82,42 @@ describe("POST /api/checkout", () => {
     await expect(response.json()).resolves.toMatchObject({
       url: "https://tutu.ru/order?z=1&x=%2F",
       kind: "deeplink",
+      steps: [
+        expect.objectContaining({
+          order: 1,
+          url: "https://tutu.ru/order?z=1&x=%2F",
+          product: "transport_outbound",
+        }),
+      ],
+    });
+  });
+
+  it("resolves multiple checkout refs into ordered steps without dropping the first URL", async () => {
+    const createCheckoutLink = vi.fn();
+    const createCheckoutSteps = vi.fn().mockResolvedValue({
+      url: "https://tutu.ru/avia",
+      kind: "deeplink",
+      steps: [
+        { order: 1, label: "Билеты туда и обратно", url: "https://tutu.ru/avia", product: "transport_outbound", kind: "deeplink" },
+        { order: 2, label: "Проживание", url: "https://hotel.tutu.ru/x", product: "hotel", kind: "deeplink" },
+      ],
+    });
+    const response = await checkoutHandler(request({
+      refs: [
+        { transport: "avia", offer_hash: "rt", is_round_trip: true, return_departure_at: "2026-09-13T18:00:00+03:00" },
+        { transport: "hotels", hotel_alias: "volga" },
+      ],
+    }), { createCheckoutLink, createCheckoutSteps });
+
+    expect(response.status).toBe(200);
+    expect(createCheckoutLink).not.toHaveBeenCalled();
+    expect(createCheckoutSteps).toHaveBeenCalledTimes(1);
+    await expect(response.json()).resolves.toMatchObject({
+      url: "https://tutu.ru/avia",
+      steps: [
+        expect.objectContaining({ product: "transport_outbound" }),
+        expect.objectContaining({ product: "hotel", url: "https://hotel.tutu.ru/x" }),
+      ],
     });
   });
 

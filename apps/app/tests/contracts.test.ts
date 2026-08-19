@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { CheckoutResponseSchema } from "../shared/contracts/checkout";
 import { InterpretRequestSchema, InterpretResponseSchema, TravelIntentSchema } from "../shared/contracts/intent";
-import { PackagePriceSchema, PackagesResponseSchema } from "../shared/contracts/packages";
+import { PackagePriceSchema } from "../shared/contracts/packages";
 
 const intent = {
   origin: "Москва",
@@ -31,11 +31,16 @@ describe("shared contracts", () => {
 
   it("distinguishes exact and estimated package price", () => {
     expect(PackagePriceSchema.safeParse({ confidence: "exact_round_trip", amount: 100, currency: "RUB" }).success).toBe(true);
-    expect(PackagePriceSchema.safeParse({ confidence: "estimated_split_trip", amount: 100, currency: "RUB", note: "wrong" }).success).toBe(false);
+    expect(PackagePriceSchema.safeParse({ confidence: "estimated_split_trip", amount: 100, currency: "RUB" }).success).toBe(false);
+    expect(PackagePriceSchema.safeParse({ confidence: "estimated_split_trip", amount: 100, currency: "RUB", note: "Два отдельных билета; цена может измениться" }).success).toBe(true);
   });
 
   it("rejects malformed checkout response", () => {
-    expect(CheckoutResponseSchema.safeParse({ packageId: "p", steps: [{ order: 1, label: "Book", url: "https://tutu.ru/x", product: "hotel" }], warnings: [] }).success).toBe(true);
-    expect(CheckoutResponseSchema.safeParse({ packageId: "p", steps: [], warnings: [] }).success).toBe(false);
+    expect(CheckoutResponseSchema.safeParse({
+      url: "https://tutu.ru/x",
+      kind: "deeplink",
+      steps: [{ order: 1, label: "Билет туда", url: "https://tutu.ru/x", product: "transport_outbound" }],
+    }).success).toBe(true);
+    expect(CheckoutResponseSchema.safeParse({ url: "https://tutu.ru/x", kind: "deeplink", steps: [] }).success).toBe(false);
   });
 });

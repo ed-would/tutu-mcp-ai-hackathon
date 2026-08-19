@@ -46,7 +46,7 @@ describe("packages API boundary", () => {
     expect(connectMock).not.toHaveBeenCalled();
   });
 
-  it("rejects invalid JSON/content type and children before opening MCP", async () => {
+  it("rejects invalid JSON/content type before opening MCP and still opens MCP for family parties", async () => {
     const mediaTypeResponse = await packagesHandler(request(valid, { "content-type": "text/plain" }));
     expect(mediaTypeResponse.status).toBe(415);
 
@@ -54,8 +54,7 @@ describe("packages API boundary", () => {
       ...valid,
       intent: { ...valid.intent, childrenAges: [8] },
     }));
-    expect(childResponse.status).toBe(422);
-    expect((await childResponse.json()).code).toBe("CHILDREN_UNSUPPORTED");
-    expect(connectMock).not.toHaveBeenCalled();
+    expect(childResponse.status).not.toBe(422);
+    expect(connectMock).toHaveBeenCalled();
   });
 });

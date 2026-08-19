@@ -1,4 +1,5 @@
 import type { HealthResponse } from "../shared/contracts/health";
+import { MCP_DURATION_BUDGETS, mcpToolFingerprint } from "../server/mcp/tools";
 import { getRequestId } from "../server/observability/request-id";
 import { getLlmStatus, getMcpStatus } from "../server/observability/readiness";
 
@@ -38,6 +39,12 @@ export function healthHandler(request: Request): Response {
     mcp: getMcpStatus(),
     timestamp: new Date().toISOString(),
     requestId,
+    fingerprint: mcpToolFingerprint(),
+    durations: {
+      llmMs: MCP_DURATION_BUDGETS.llmMs,
+      mcpCallMs: MCP_DURATION_BUDGETS.mcpCallMs,
+      routeMs: MCP_DURATION_BUDGETS.routeMs,
+    },
   };
 
   return jsonResponse(body, 200, requestId);

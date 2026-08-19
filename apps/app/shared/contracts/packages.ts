@@ -1,49 +1,61 @@
 import { z } from "zod";
-import { DestinationIdeaSchema, TravelIntentSchema } from "./intent";
-import { PreferenceVectorSchema, SourceEvidenceSchema, SourceWarningSchema } from "./common";
+import { SourceEvidenceSchema, SourceWarningSchema } from "./common";
 
 export const PackagePriceSchema = z.discriminatedUnion("confidence", [
-  z.object({ confidence: z.literal("exact_round_trip"), amount: z.number().nonnegative(), currency: z.literal("RUB") }),
+  z.object({
+    confidence: z.literal("exact_round_trip"),
+    amount: z.number().nonnegative(),
+    currency: z.literal("RUB"),
+  }),
   z.object({
     confidence: z.literal("estimated_split_trip"),
     amount: z.number().nonnegative(),
     currency: z.literal("RUB"),
-    note: z.literal("Два отдельных билета; цена может измениться"),
+    note: z.string().min(1).max(200),
   }),
 ]);
 
 export type PackagePrice = z.infer<typeof PackagePriceSchema>;
 
-export const TripSegmentSchema = z.object({
-  kind: z.enum(["transport_outbound", "transport_return", "hotel"]),
-  title: z.string().min(1).max(160),
-  amount: z.number().nonnegative().optional(),
-  currency: z.literal("RUB").optional(),
-  checkoutRef: z.string().min(1).max(16_384).optional(),
-  sourceTool: z.string().min(1).max(120).optional(),
-});
-
-export type TripSegment = z.infer<typeof TripSegmentSchema>;
-
 export const TripPackageSchema = z.object({
   id: z.string().min(1).max(100),
-  ideaId: z.string().min(1).max(80),
+  ideaId: z.string().min(1).max(80).optional(),
   title: z.string().min(1).max(160),
-  mode: z.enum(["avia", "rail", "bus", "multitransport"]),
+  destination: z.string().min(1).max(120),
+  role: z.enum(["optimal", "faster_or_comfortable"]),
+  transport: z.object({
+    mode: z.string().min(1).max(80),
+    price: z.number().nonnegative().optional(),
+    currency: z.string().min(1).max(8).optional(),
+    outbound: z.unknown().optional(),
+    return: z.unknown().optional(),
+    checkoutRef: z.unknown().optional(),
+    returnCheckoutRef: z.unknown().optional(),
+  }),
+  hotel: z.object({
+    name: z.string().min(1).max(160),
+    price: z.number().nonnegative().optional(),
+    currency: z.string().min(1).max(8).optional(),
+    nights: z.number().int().positive().optional(),
+    checkoutRef: z.unknown().optional(),
+  }).optional(),
   price: PackagePriceSchema,
-  segments: z.array(TripSegmentSchema).min(1).max(8),
-  timestamp: z.string().datetime(),
+  breakdown: z.object({
+    transport: z.number().nonnegative().optional(),
+    hotel: z.number().nonnegative().optional(),
+  }),
   source: z.literal("Tutu MCP"),
-  isPartial: z.boolean().default(false),
-  note: z.string().max(500).optional(),
+  updatedAt: z.string().datetime(),
+  timestamp: z.string().datetime(),
+  isPartial: z.boolean(),
 });
 
 export type TripPackage = z.infer<typeof TripPackageSchema>;
 
 export const PackagesRequestSchema = z.object({
-  intent: TravelIntentSchema,
-  idea: DestinationIdeaSchema,
-  preferences: PreferenceVectorSchema,
+  intent: z.record(z.string(), z.unknown()),
+  idea: z.record(z.string(), z.unknown()),
+  preferences: z.record(z.string(), z.unknown()).default({}),
   sessionSeed: z.string().trim().min(1).max(128),
 });
 
@@ -53,6 +65,8 @@ export const PackagesResponseSchema = z.object({
   packages: z.array(TripPackageSchema).max(2),
   warnings: z.array(SourceWarningSchema).max(20),
   sources: z.array(SourceEvidenceSchema).max(20),
+  requestId: z.string().min(1).max(128).optional(),
+  preferenceSummary: z.string().max(240).optional(),
 });
 
 export type PackagesResponse = z.infer<typeof PackagesResponseSchema>;

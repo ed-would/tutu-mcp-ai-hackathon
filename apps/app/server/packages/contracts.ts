@@ -20,6 +20,9 @@ export const PackagePriceSchema = z.object({
 
 export type PackagePrice = z.infer<typeof PackagePriceSchema>;
 
+export type PackageToolName = "search_multitransport" | "search_hotels" | "search_avia" | "search_bus";
+export type PackageRole = "optimal" | "faster_or_comfortable";
+
 export type SourceWarning = {
   code: string;
   message: string;
@@ -28,7 +31,7 @@ export type SourceWarning = {
 };
 
 export type SourceEvidence = {
-  tool: "search_multitransport" | "search_hotels";
+  tool: PackageToolName;
   status: "ok" | "partial" | "unavailable";
   receivedAt: string;
   variants: number;
@@ -36,8 +39,10 @@ export type SourceEvidence = {
 
 export type TripPackage = {
   id: string;
+  ideaId?: string;
   title: string;
   destination: string;
+  role: PackageRole;
   transport: {
     mode: string;
     price?: number;
@@ -45,6 +50,7 @@ export type TripPackage = {
     outbound?: unknown;
     return?: unknown;
     checkoutRef?: unknown;
+    returnCheckoutRef?: unknown;
   };
   hotel?: {
     name: string;
@@ -60,6 +66,8 @@ export type TripPackage = {
   };
   source: "Tutu MCP";
   updatedAt: string;
+  timestamp: string;
+  isPartial: boolean;
 };
 
 export type PackagesResponse = {
@@ -67,6 +75,7 @@ export type PackagesResponse = {
   warnings: SourceWarning[];
   sources: SourceEvidence[];
   requestId: string;
+  preferenceSummary?: string;
 };
 
 export type PackageCallResult = {
@@ -76,7 +85,7 @@ export type PackageCallResult = {
 };
 
 export type PackageCallTool = (
-  name: "search_multitransport" | "search_hotels",
+  name: PackageToolName,
   args: Record<string, unknown>,
   timeoutMs: number,
 ) => Promise<PackageCallResult>;
@@ -87,13 +96,27 @@ export type PackageOptions = {
   callTool?: PackageCallTool;
 };
 
+export type PassengerParty = {
+  childrenAges: number[];
+  aviaAdults: number;
+  aviaChildren: number;
+  aviaInfants: number;
+  busAdults: number;
+  busChildren: number;
+  isFamily: boolean;
+};
+
 export type SearchInputs = {
   origin: string;
   destination: string;
   departureDate: string;
   returnDate: string;
   adults: number;
+  childrenAges: number[];
+  party: PassengerParty;
   hotelPreferences: Record<string, unknown>;
+  ideaId?: string;
+  allowedTransport: Array<"avia" | "rail" | "bus" | "multitransport">;
 };
 
 export function readString(record: Record<string, unknown>, ...keys: string[]): string | undefined {
@@ -162,6 +185,34 @@ export function normalizeDate(value: unknown): string | undefined {
   return parsed.success ? parsed.data : undefined;
 }
 
+export function mapPassengerParty(adults: number, childrenAges: unknown): PassengerParty {
+  const ages = Array.isArray(childrenAges)
+    ? childrenAges.filter((age): age is number => typeof age === "number" && Number.isInteger(age) && age >= 0 && age <= 17)
+    : [];
+  const aviaInfants = ages.filter((age) => age <= 1).length;
+  const aviaChildren = ages.filter((age) => age >= 2 && age <= 11).length;
+  const teenAdults = ages.filter((age) => age >= 12).length;
+  const aviaAdults = Math.min(9, Math.max(1, adults + teenAdults));
+  return {
+    childrenAges: ages,
+    aviaAdults,
+    aviaChildren: Math.min(9, aviaChildren),
+    aviaInfants: Math.min(9, aviaInfants),
+    busAdults: Math.min(8, aviaAdults),
+    busChildren: Math.min(7, aviaChildren + aviaInfants),
+    isFamily: ages.length > 0,
+  };
+}
+
+function readAllowedTransport(intent: Record<string, unknown>): SearchInputs["allowedTransport"] {
+  const raw = intent.allowedTransport ?? intent.allowed_transport;
+  if (!Array.isArray(raw)) return ["avia", "rail", "bus", "multitransport"];
+  const allowed = raw.filter((item): item is SearchInputs["allowedTransport"][number] =>
+    item === "avia" || item === "rail" || item === "bus" || item === "multitransport",
+  );
+  return allowed.length > 0 ? allowed : ["avia", "rail", "bus", "multitransport"];
+}
+
 export function getSearchInputs(request: PackagesRequest): SearchInputs | { error: string } {
   const intent = request.intent;
   const idea = request.idea;
@@ -171,16 +222,13 @@ export function getSearchInputs(request: PackagesRequest): SearchInputs | { erro
   const departureDate = normalizeDate(intent.departureDate ?? intent.departure_date ?? intent.checkIn ?? intent.check_in);
   const returnDate = normalizeDate(intent.returnDate ?? intent.return_date ?? intent.checkOut ?? intent.check_out);
   const adults = readNumber(intent, "adults", "adultCount", "passengers") ?? 1;
-  const children = intent.childrenAges ?? intent.children_ages ?? intent.children;
+  const party = mapPassengerParty(adults, intent.childrenAges ?? intent.children_ages ?? intent.children);
 
   if (!origin || !destination || !departureDate || !returnDate) {
     return { error: "Origin, destination, departure date and return date are required." };
   }
   if (departureDate >= returnDate) return { error: "Return date must be after departure date." };
   if (!Number.isInteger(adults) || adults < 1 || adults > 6) return { error: "Adults must be an integer from 1 to 6." };
-  if (Array.isArray(children) && children.length > 0) {
-    return { error: "Family pricing is deferred: live multitransport search supports adults only." };
-  }
 
   const rawPrefs = readObject(intent, "hotelPreferences", "hotel_preferences") ?? {};
   const prefs: Record<string, unknown> = {};
@@ -200,5 +248,16 @@ export function getSearchInputs(request: PackagesRequest): SearchInputs | { erro
   for (const [from, to] of Object.entries(aliases)) {
     if (prefs[to] === undefined && rawPrefs[from] !== undefined) prefs[to] = rawPrefs[from];
   }
-  return { origin, destination, departureDate, returnDate, adults, hotelPreferences: prefs };
+  return {
+    origin,
+    destination,
+    departureDate,
+    returnDate,
+    adults,
+    childrenAges: party.childrenAges,
+    party,
+    hotelPreferences: prefs,
+    ideaId: readString(idea, "id"),
+    allowedTransport: readAllowedTransport(intent),
+  };
 }

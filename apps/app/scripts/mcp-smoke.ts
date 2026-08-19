@@ -7,6 +7,8 @@ import {
 
 const REQUIRED_TOOLS = [
   "search_multitransport",
+  "search_avia",
+  "search_bus",
   "search_hotels",
   "create_checkout_link",
 ] as const;

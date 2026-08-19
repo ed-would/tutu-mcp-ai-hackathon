@@ -1,10 +1,17 @@
 import { z } from "zod";
 import { SourceWarningSchema } from "./common";
 
-export const CheckoutRequestSchema = z.object({
-  packageId: z.string().trim().min(1).max(100),
-  refs: z.array(z.string().trim().min(1).max(16_384)).min(1).max(8),
-});
+const CheckoutRefSchema = z
+  .record(z.string(), z.unknown())
+  .refine((value) => Object.keys(value).length > 0, "checkoutRef must not be empty");
+
+export const CheckoutRequestSchema = z
+  .object({
+    checkoutRef: CheckoutRefSchema.optional(),
+    checkout_ref: CheckoutRefSchema.optional(),
+    refs: z.array(CheckoutRefSchema).min(1).max(8).optional(),
+  })
+  .strict();
 
 export type CheckoutRequest = z.infer<typeof CheckoutRequestSchema>;
 
@@ -21,9 +28,13 @@ export const CheckoutStepSchema = z.object({
 export type CheckoutStep = z.infer<typeof CheckoutStepSchema>;
 
 export const CheckoutResponseSchema = z.object({
-  packageId: z.string().min(1).max(100),
+  url: z.string().url(),
+  kind: z.string().min(1).max(120),
+  fallbackUrl: z.string().url().optional(),
+  note: z.string().max(500).optional(),
+  requestId: z.string().min(1).max(128).optional(),
   steps: z.array(CheckoutStepSchema).min(1).max(8),
-  warnings: z.array(SourceWarningSchema).max(20).default([]),
+  warnings: z.array(SourceWarningSchema).max(20).optional(),
 });
 
 export type CheckoutResponse = z.infer<typeof CheckoutResponseSchema>;

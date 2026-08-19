@@ -2,8 +2,8 @@ import { generatedOutputSchema, type GeneratedOutput, type InterpretRequest } fr
 
 export const NEURALDEEP_BASE_URL = "https://api.neuraldeep.ru/v1";
 export const YANDEX_BASE_URL = "https://ai.api.cloud.yandex.net/v1";
-const NEURALDEEP_TIMEOUT_MS = 15_000;
-const YANDEX_TIMEOUT_MS = 30_000;
+const NEURALDEEP_TIMEOUT_MS = 8_000;
+const YANDEX_TIMEOUT_MS = 8_000;
 
 type Env = Record<string, string | undefined>;
 export type FetchLike = (input: string | URL | Request, init?: RequestInit) => Promise<Response>;

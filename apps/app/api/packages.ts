@@ -1,7 +1,8 @@
 import { closeTutuMcp, connectTutuMcp } from "../server/mcp/client";
+import { withMcpRetry } from "../server/mcp/retry";
 import { getRequestId } from "../server/observability/request-id";
 import { buildPackagesResponse } from "../server/packages/orchestrator";
-import { getSearchInputs, PackagesRequestSchema, type PackageCallResult } from "../server/packages/contracts";
+import { getSearchInputs, PackagesRequestSchema, type PackageCallResult, type PackageToolName } from "../server/packages/contracts";
 
 export const MAX_PACKAGES_BODY_BYTES = 16 * 1024;
 
@@ -46,21 +47,25 @@ export async function packagesHandler(request: Request): Promise<Response> {
   }
   const inputs = getSearchInputs(parsed.data);
   if ("error" in inputs) {
-    const code = inputs.error.startsWith("Family pricing") ? "CHILDREN_UNSUPPORTED" : "INVALID_REQUEST";
-    return jsonResponse({ code, message: inputs.error, retryable: false, requestId, stage: "validation" }, 422, requestId);
+    return jsonResponse({ code: "INVALID_REQUEST", message: inputs.error, retryable: false, requestId, stage: "validation" }, 422, requestId);
   }
 
-  const connection = await connectTutuMcp().catch(() => undefined);
+  let connection: Awaited<ReturnType<typeof connectTutuMcp>> | undefined;
+  try {
+    connection = await connectTutuMcp();
+  } catch {
+    connection = undefined;
+  }
   if (!connection) return jsonResponse({ code: "MCP_UNAVAILABLE", message: "Tutu MCP is temporarily unavailable.", retryable: true, requestId, stage: "mcp-call" }, 503, requestId);
   try {
-    const callTool = async (name: "search_multitransport" | "search_hotels", args: Record<string, unknown>, timeoutMs: number): Promise<PackageCallResult> => {
-      return connection.client.callTool({ name, arguments: args }, { timeout: timeoutMs });
+    const callTool = async (name: PackageToolName, args: Record<string, unknown>, timeoutMs: number): Promise<PackageCallResult> => {
+      return withMcpRetry(() => connection.client.callTool({ name, arguments: args }, { timeout: timeoutMs }) as Promise<PackageCallResult>);
     };
     const response = await buildPackagesResponse(body as never, { callTool, requestId });
     const hasValidation = response.warnings.some((warning) => warning.source === "validation");
     const hasUnavailable = response.warnings.some((warning) => warning.code.includes("UNAVAILABLE") || warning.code.includes("TIMEOUT"));
     return jsonResponse(response, hasValidation ? 422 : hasUnavailable && response.packages.length === 0 ? 503 : 200, requestId);
-  } catch (error) {
+  } catch {
     return jsonResponse({ code: "PACKAGES_FAILED", message: "Package search failed.", retryable: true, requestId, stage: "packages" }, 500, requestId);
   } finally {
     try {
