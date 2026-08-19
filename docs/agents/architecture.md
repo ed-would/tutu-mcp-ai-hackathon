@@ -11,30 +11,13 @@ High-level layout for the Tutu MCP hackathon project. Coding rules live in [type
 | `docs/agents/` | Progressive-disclosure instructions for AI agents (`AGENTS.md` index) |
 | `docs/plans/` | Planning docs — standards, standards-cursor, templates (see below) |
 | `apps/app/` | **Application root** — Travel Tinder web app (not yet scaffolded) |
-| `apps/landing/` | Landing page (not yet scaffolded) |
 | `specs/` | ADRs, architecture specs, domain specs, feature specs, fixtures |
 | `.cursor/` | Rules, skills, agents, commands for Cursor automation |
 | `AGENTS.md` | Compact agent entry point at repo root |
 
 ## Application (`apps/app`)
 
-Not yet scaffolded. Planned stack: Next.js 15, TypeScript, Tailwind CSS v4, Zustand, Framer Motion, Zod, OpenAI SDK (NeuralDeep), MCP SDK (Tutu), Vitest.
-
-Planned layout (to be created when scaffolding begins):
-
-```text
-apps/app/
-├── src/app/            # App Router: /, /deck, /match/[id], /health, /api/*
-├── src/components/     # UI — brand, deck, home, layout, match, prefs, prompt
-├── src/lib/llm/        # NeuralDeep client, intent, ideas, schemas, fallback
-├── src/lib/mcp/        # Tutu MCP client, search tools, checkout, playbooks
-├── src/lib/packages/   # Package builder, ranking, offer parsing
-├── src/lib/prefs/      # Preference vector, scoring, labels
-├── src/lib/state/      # Zustand store (TinderStore)
-├── scripts/            # mcp-smoke, packages-smoke, fallback-smoke
-├── public/brand/       # Tutu logo SVG and static brand assets
-└── .env.example        # NEURALDEEP_* template (copy to .env.local)
-```
+Not yet scaffolded. **Stack not decided** — choose before initialising the app directory.
 
 ## MCP reference (`docs/tutu-mcp/`)
 
@@ -91,8 +74,7 @@ tutu-mcp-hack/
 ├── README.md
 ├── AGENTS.md
 ├── apps/
-│   ├── app/          # Next.js Travel Tinder web app
-│   └── landing/      # Landing page
+│   └── app/          # Travel Tinder web app (stack TBD)
 ├── docs/tutu-mcp/
 ├── docs/
 │   ├── README.md

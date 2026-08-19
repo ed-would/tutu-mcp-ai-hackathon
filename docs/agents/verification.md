@@ -4,27 +4,28 @@
 
 Before claiming a task **complete**, run whatever build/test/lint commands the project defines.
 
-**Application (`apps/web`):**
+**Application (`apps/app`):**
 
 ```bash
-cd apps/web && pnpm install
-pnpm build && pnpm lint && pnpm test
+cd apps/app && npm install
+npm run build && npm run lint && npm run test
 ```
 
 | Command | Purpose |
 | ------- | ------- |
-| `pnpm dev` | Local dev server |
-| `pnpm build` | Production build |
-| `pnpm lint` | ESLint |
-| `pnpm test` | Vitest — prefs, packages, dates |
-| `pnpm start` | Serve production build |
-| `pnpm mcp-smoke` | MCP `tools/list` + playbook smoke (`scripts/mcp-smoke.ts`) |
-| `pnpm packages-smoke` | Package builder orchestration smoke (`scripts/packages-smoke.ts`) |
+| `npm run dev` | Local dev server |
+| `npm run build` | Production build |
+| `npm run lint` | Oxlint + Stylelint |
+| `npm run format` | Oxfmt |
+| `npm run test` | Unit tests |
+| `npm run start` | Serve production build |
+| `npm run mcp-smoke` | MCP `tools/list` + playbook smoke (`scripts/mcp-smoke.ts`) |
+| `npm run packages-smoke` | Package builder orchestration smoke (`scripts/packages-smoke.ts`) |
 
 From repo root (equivalent):
 
 ```bash
-pnpm --dir apps/web dev|build|lint|test|mcp-smoke|packages-smoke
+npm run --prefix apps/app dev|build|lint|test|mcp-smoke|packages-smoke
 ```
 
 Required when the change touches **application source**, **MCP integration logic**, **CI**, or **`package.json`** in ways that affect build or runtime.
@@ -61,7 +62,7 @@ Judging evidence map: [docs/plans/tinder/judging-checklist.md](../plans/tinder/j
 **In-app script (preferred):**
 
 ```bash
-pnpm --dir apps/web mcp-smoke
+npm run --prefix apps/app mcp-smoke
 ```
 
 **curl (no app):**
@@ -77,4 +78,4 @@ Compare tool names with `docs/tutu-mcp/tutu-mcp-tools.json` when updating integr
 
 ## Deploy verification
 
-After [docs/plans/tinder/deploy.md](../plans/tinder/deploy.md): `pnpm --dir apps/web build` on CI/Vercel; PW-6 on production URL; `/health` shows MCP + LLM status.
+After [docs/plans/tinder/deploy.md](../plans/tinder/deploy.md): `npm run --prefix apps/app build` on CI/Vercel; PW-6 on production URL; `/health` shows MCP + LLM status.

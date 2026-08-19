@@ -3,7 +3,7 @@
 Живой endpoint: [https://mcp.tutu.ru/mcp](https://mcp.tutu.ru/mcp)  
 Лендинг с инструкцией подключения: тот же URL (в браузере — HTML, для агента — MCP Streamable HTTP).
 
-Публичной «доки в Medium» почти нет: вся документация **внутри самого MCP** (`instructions`, playbooks, `tutu://*` resources). Ниже — выжимка с живого сервера **v0.26.0** (снято 2026-08-02).
+Публичной «доки в Medium» почти нет: вся документация **внутри самого MCP** (`instructions`, playbooks, `tutu://*` resources). Ниже — выжимка с живого сервера **v0.38.0** (снято 2026-08-19).
 
 ## Что это
 

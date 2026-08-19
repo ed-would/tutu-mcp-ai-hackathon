@@ -98,7 +98,7 @@ Treat repository-root `AGENTS.md` as a **canonical anchor**: it loads on many se
 **Root `AGENTS.md` SHOULD include** (order flexible):
 
 1. **Project purpose** — one short paragraph or sentence; optional one-line tech stack if it fits
-2. **Package manager** — only when not the obvious default for the ecosystem (e.g. pnpm / yarn / corepack)
+2. **Package manager** — only when not the obvious default for the ecosystem (e.g. yarn / corepack; this project uses npm)
 3. **Quick start** — install, build, test, `lint:fix`; call out any non-standard scripts
 4. **Non-negotiables** — protected contracts, agent Git policy, verification before claiming “done”, pointer to `alwaysApply` rules (e.g. `.cursor/rules/project.mdc`) instead of duplicating them
 5. **Progressive disclosure** — table or short list of **markdown links** to deeper material (in this repo: `docs/agents/*.md` — conventions, architecture, optional skills catalog, documentation index and specialised agents)
